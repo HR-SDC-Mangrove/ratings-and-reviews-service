@@ -2,3 +2,4 @@ node_modules
 mongooseSchema.js
 postgresETL.js
 local_schemas
+.env

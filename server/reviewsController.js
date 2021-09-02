@@ -125,6 +125,23 @@ const reviewsMeta = (req, res) => {
 
 // ADD PRODUCT NAME ROUTE
 
+/*
+TODO:
+add routes:
+-product name
+-report review
+-mark review helpful
+-post new review
+
+-calculate averages of characteristic values
+-add photos to data (new query, etc)
+-add evergreen data for potential failing requests
+
+-consolidate all requests into one request, one data blob for entire widget
+-try consolidating queries using joins
+-consider alternative data structures
+*/
+
 module.exports = {
   reviews,
   reviewsMeta,

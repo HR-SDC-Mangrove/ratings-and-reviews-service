@@ -69,7 +69,10 @@ const reviewsMeta = (req, res) => {
       let output = {
         product_id: productId.toString(),
         ratings: {},
-        recommend: {},
+        recommended: {
+          true: 0,
+          false: 0,
+        },
         characteristics: {},
       };
 
@@ -86,11 +89,7 @@ const reviewsMeta = (req, res) => {
           output.ratings[key] = output.ratings[key].toString();
         }
 
-        if (!output.recommend[item.recommend]) {
-          output.recommend[item.recommend] = 1;
-        } else if (output.recommend[item.recommend]) {
-          output.recommend[item.recommend]++;
-        }
+        output.recommended[item.recommended]++;
 
         let reviewId = item.id;
 
@@ -111,8 +110,8 @@ const reviewsMeta = (req, res) => {
               //   valueTracker[data[i].id].push(data[i].value);
               // }
             }
-            // console.log('VALUE TRACKER', valueTracker);
             console.log(output);
+            res.send(output);
           })
           .catch((error) => {
             console.log(error);
@@ -123,6 +122,8 @@ const reviewsMeta = (req, res) => {
       console.log(err);
     });
 };
+
+// ADD PRODUCT NAME ROUTE
 
 module.exports = {
   reviews,

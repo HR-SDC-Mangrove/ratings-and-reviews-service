@@ -1,5 +1,3 @@
-CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
-
 DROP SCHEMA IF EXISTS reviews CASCADE;
 
 CREATE SCHEMA reviews
@@ -11,6 +9,8 @@ CREATE SCHEMA reviews
     category TEXT,
     default_price INTEGER
   )
+
+  CREATE INDEX ON products(id)
 
   CREATE TABLE reviews(
     id INTEGER NOT NULL PRIMARY KEY,
@@ -27,11 +27,15 @@ CREATE SCHEMA reviews
     helpfulness INTEGER
   )
 
+  CREATE INDEX ON reviews(product_id)
+
   CREATE TABLE reviews_photos(
     id INTEGER NOT NULL PRIMARY KEY,
     review_id INTEGER,
     url TEXT
   )
+
+  CREATE INDEX ON reviews_photos(id)
 
   CREATE TABLE reviews_characteristics(
     id INTEGER NOT NULL PRIMARY KEY,
@@ -40,11 +44,15 @@ CREATE SCHEMA reviews
     value INTEGER
   )
 
+  CREATE INDEX ON reviews_characteristics(id)
+
   CREATE TABLE characteristics(
     id INTEGER NOT NULL PRIMARY KEY,
     product_id INTEGER,
     name TEXT
-  );
+  )
+
+  CREATE INDEX ON characteristics(id);
 
 SET search_path TO reviews;
 
@@ -58,3 +66,22 @@ SET search_path TO reviews;
 
 \copy reviews_photos(id, review_id, url) from '/Users/sunikkim/Desktop/coding/HR-IMMERSIVE/SDC-DATA/reviews_photos.csv' delimiter ',' csv header;
 
+EXPLAIN ANALYZE SELECT * from REVIEWS WHERE product_id=1;
+EXPLAIN ANALYZE SELECT * from REVIEWS WHERE product_id=10000;
+EXPLAIN ANALYZE SELECT * from REVIEWS WHERE product_id=10000000;
+
+EXPLAIN ANALYZE SELECT * from PRODUCTS WHERE id=1;
+EXPLAIN ANALYZE SELECT * from PRODUCTS WHERE id=10000;
+EXPLAIN ANALYZE SELECT * from PRODUCTS WHERE id=10000000;
+
+EXPLAIN ANALYZE SELECT * from CHARACTERISTICS WHERE id=1;
+EXPLAIN ANALYZE SELECT * from CHARACTERISTICS WHERE id=10000;
+EXPLAIN ANALYZE SELECT * from CHARACTERISTICS WHERE id=10000000;
+
+EXPLAIN ANALYZE SELECT * from REVIEWS_CHARACTERISTICS WHERE id=1;
+EXPLAIN ANALYZE SELECT * from REVIEWS_CHARACTERISTICS WHERE id=10000;
+EXPLAIN ANALYZE SELECT * from REVIEWS_CHARACTERISTICS WHERE id=10000000;
+
+EXPLAIN ANALYZE SELECT * from REVIEWS_PHOTOS WHERE id=1;
+EXPLAIN ANALYZE SELECT * from REVIEWS_PHOTOS WHERE id=10000;
+EXPLAIN ANALYZE SELECT * from REVIEWS_PHOTOS WHERE id=10000000;

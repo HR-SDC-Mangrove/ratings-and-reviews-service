@@ -5,7 +5,7 @@
 /* eslint-disable no-console */
 const { db } = require('../database/index');
 
-const reviews = (req, res) => {
+const getReviews = (req, res) => {
   const { productId } = req.params;
 
   const query = `
@@ -173,15 +173,33 @@ const reviews = (req, res) => {
     });
 };
 
+const markReviewHelpful = (req, res) => {
+  const { reviewId } = req.params;
+
+  const query = `
+  UPDATE reviews
+  SET helpfulness = helpfulness + 1
+  WHERE id=$1
+  ;`;
+
+  db.any(query, reviewId)
+    .then(() => {
+      res.send(200);
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+};
+
 module.exports = {
-  reviews,
+  getReviews,
+  markReviewHelpful,
 };
 
 /*
 TODO:
 add routes:
 -report review
--mark review helpful
 -post new review
 
 -add evergreen data for potential failing requests

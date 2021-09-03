@@ -1,148 +1,187 @@
 const { db } = require('../database/index');
 
 const reviews = (req, res) => {
-  let productId = req.params.productId;
-  console.log('REQUESTED product id: ', productId);
+  const productId = req.params.productId;
 
-  let query = 'SELECT id, rating, summary, recommend, response, body, to_timestamp(date / 1000), reviewer_name, helpfulness FROM reviews WHERE product_id=$1';
-  let query2 = 'SELECT * FROM reviews_photos WHERE review_id=$1';
-  let query3 = 'SELECT * FROM reviews_characteristics WHERE review_id=$1';
-  let query4 = 'SELECT name FROM products WHERE id=$1';
-  let query5 = 'SELECT name FROM characteristics WHERE id=$1';
+  const query = `
+  SELECT
+    reviews.id AS reviews_id, reviews.rating, reviews.summary, reviews.recommend, reviews.response, reviews.body, to_timestamp(reviews.date / 1000) AS date, reviews.reviewer_name, reviews.helpfulness, reviews_characteristics.value AS characteristics_value, reviews_characteristics.characteristic_id AS characteristics_id, characteristics.name AS characteristics_name, products.name AS product_name,
+    CASE WHEN EXISTS (SELECT reviews_photos.url FROM reviews_photos WHERE reviews_photos.review_id = reviews.id)
+      THEN (SELECT reviews_photos.url FROM reviews_photos WHERE reviews_photos.review_id = reviews.id)
+      ELSE ''
+    END AS photo_url,
+    CASE WHEN EXISTS (SELECT reviews_photos.id FROM reviews_photos WHERE reviews_photos.review_id = reviews.id)
+      THEN (SELECT id FROM reviews_photos WHERE reviews_photos.review_id = reviews.id)
+      ELSE NULL
+    END AS photo_id
+  FROM reviews, reviews_characteristics, characteristics, products
+  WHERE reviews.product_id = $1
+  AND reviews_characteristics.review_id = reviews.id
+  AND characteristics.id = reviews_characteristics.characteristic_id
+  AND reviews.product_id = products.id
+  GROUP BY reviews.id, reviews_characteristics.value, characteristics.name, products.name, reviews_characteristics.characteristic_id
+  ;`;
 
-  let output = {
+  const output = {
     product: productId,
+    productName: '',
+    meta: {},
     results: [],
   };
 
   db.any(query, productId)
     .then((result) => {
-      // add evergreen/default data for failed requests/faulty data
-      // console.log(result);
+      output.productName = result[0].product_name;
+
+      const reviewsTracker = {};
 
       for (let i = 0; i < result.length; i++) {
-        let item = result[i];
+        const item = result[i];
+
+        if (!reviewsTracker[item.reviews_id]) {
+          reviewsTracker[item.reviews_id] = [item];
+        } else if (reviewsTracker[item.reviews_id]) {
+          reviewsTracker[item.reviews_id].push(item);
+        }
+      }
+
+      const extractPhotos = (reviews) => {
+        const photos = [];
+        const tracker = [];
+
+        for (let i = 0; i < reviews.length; i++) {
+          const item = reviews[i];
+
+          const obj = {
+            id: item.photo_id,
+            url: item.photo_url,
+          };
+
+          if (!tracker.includes(item.photo_url) && item.photo_url) {
+            photos.push(obj);
+          }
+
+          tracker.push(item.photo_url);
+        }
+
+        return photos;
+      };
+
+      const extractCharacteristics = (reviews) => {
+        const chars = {};
+
+        for (let i = 0; i < reviews.length; i++) {
+          const item = reviews[i];
+
+          if (!chars[item.characteristics_name]) {
+            chars[item.characteristics_name] = [
+              item.characteristics_id,
+              item.characteristics_value,
+            ];
+          } else if (chars[item.characteristics_name]) {
+            chars[item.characteristics_name].push(item.characteristics_value);
+          }
+        }
+
+        const getAverage = (arr) => {
+          return arr.reduce((acc, n) => acc + n) / arr.length;
+        };
+
+        for (let key in chars) {
+          let item = chars[key];
+
+          let obj = { id: 0, value: '' };
+
+          obj.id = item[0];
+          obj.value = getAverage(item.slice(1)).toString();
+
+          chars[key] = obj;
+        }
+
+        return chars;
+      };
+
+      const constructMeta = (reviews, tracker) => {
+        const reviewsUniq = [];
+
+        for (let key in tracker) {
+          reviewsUniq.push(tracker[key][0]);
+        }
+
+        const meta = {
+          product_id: productId.toString(),
+          ratings: {},
+          recommended: {
+            true: 0,
+            false: 0,
+          },
+          characteristics: extractCharacteristics(reviews),
+        };
+
+        for (let i = 0; i < reviewsUniq.length; i++) {
+          const item = reviewsUniq[i];
+
+          if (!meta.ratings[item.rating]) {
+            meta.ratings[item.rating] = 1;
+          } else if (meta.ratings[item.rating]) {
+            meta.ratings[item.rating]++;
+          }
+
+          for (let key in meta.ratings) {
+            meta.ratings[key] = meta.ratings[key].toString();
+          }
+
+          meta.recommended[item.recommend]++;
+        }
+
+        return meta;
+      };
+
+      output.meta = constructMeta(result, reviewsTracker);
+
+      for (let review in reviewsTracker) {
+        const item = reviewsTracker[review][0];
 
         if (item.response === 'null') {
           item.response = null;
         }
 
-        let reviewObj = {
-          review_id: item.id,
+        const reviewObj = {
+          review_id: item.reviews_id,
           rating: item.rating,
           summary: item.summary,
           recommend: item.recommend,
           response: item.response,
           body: item.body,
-          date: JSON.stringify(item.to_timestamp).slice(1, -1),
+          date: JSON.stringify(item.date).slice(1, -1),
           reviewer_name: item.reviewer_name,
           helpfulness: item.helpfulness,
-          photos: [],
+          photos: extractPhotos(reviewsTracker[review]),
         };
 
         output.results.push(reviewObj);
       }
 
-      console.log('output', output);
+      console.log(output);
       res.send(output);
     })
-    .catch(err => {
+    .catch((err) => {
       console.log(err);
     });
 };
 
-const reviewsMeta = (req, res) => {
-  let productId = req.params.productId;
-  console.log('REQUESTED product id: ', productId);
-
-  let query = 'SELECT * FROM reviews WHERE product_id=$1';
-  let query2 = 'SELECT * FROM reviews_photos WHERE review_id=$1';
-  let query3 = 'SELECT * FROM reviews_characteristics, characteristics WHERE reviews_characteristics.review_id=$1 AND reviews_characteristics.characteristic_id = characteristics.id';
-  let query4 = 'SELECT name FROM products WHERE id=$1';
-  let query5 = 'SELECT name FROM characteristics WHERE id=$1';
-
-  db.any(query, productId)
-    .then((result) => {
-      // add evergreen/default data for failed requests/faulty data
-      console.log('META', result);
-
-      let output = {
-        product_id: productId.toString(),
-        ratings: {},
-        recommended: {
-          true: 0,
-          false: 0,
-        },
-        characteristics: {},
-      };
-
-      for (let i = 0; i < result.length; i++) {
-        let item = result[i];
-
-        if (!output.ratings[item.rating]) {
-          output.ratings[item.rating] = 1;
-        } else if (output.ratings[item.rating]) {
-          output.ratings[item.rating]++;
-        }
-
-        for (let key in output.ratings) {
-          output.ratings[key] = output.ratings[key].toString();
-        }
-
-        output.recommended[item.recommended]++;
-
-        let reviewId = item.id;
-
-        db.any(query3, reviewId)
-          .then((data) => {
-            console.log('CHARACTERISTICS', data);
-
-            for (let i = 0; i < data.length; i++) {
-              output.characteristics[data[i].name] = {
-                id: data[i].id,
-                value: data[i].value.toString(),
-              };
-
-              //GET AVERAGES OF VALUES
-              // if (!valueTracker[data[i].id]) {
-              //   valueTracker[data[i].id] = data[i].value;
-              // } else if (valueTracker[data[i].id]) {
-              //   valueTracker[data[i].id].push(data[i].value);
-              // }
-            }
-            console.log(output);
-            res.send(output);
-          })
-          .catch((error) => {
-            console.log(error);
-          });
-      }
-    })
-    .catch(err => {
-      console.log(err);
-    });
+module.exports = {
+  reviews,
 };
-
-// ADD PRODUCT NAME ROUTE
 
 /*
 TODO:
 add routes:
--product name
 -report review
 -mark review helpful
 -post new review
 
--calculate averages of characteristic values
--add photos to data (new query, etc)
 -add evergreen data for potential failing requests
 
--consolidate all requests into one request, one data blob for entire widget
--try consolidating queries using joins
--consider alternative data structures
+-implement 'sort by' feature (relevance, newness, helpfulness)
 */
-
-module.exports = {
-  reviews,
-  reviewsMeta,
-};

@@ -1,7 +1,12 @@
+/* eslint-disable no-restricted-syntax */
+/* eslint-disable guard-for-in */
+/* eslint-disable no-shadow */
+/* eslint-disable no-plusplus */
+/* eslint-disable no-console */
 const { db } = require('../database/index');
 
 const reviews = (req, res) => {
-  const productId = req.params.productId;
+  const { productId } = req.params;
 
   const query = `
   SELECT
@@ -83,16 +88,14 @@ const reviews = (req, res) => {
           }
         }
 
-        const getAverage = (arr) => {
-          return arr.reduce((acc, n) => acc + n) / arr.length;
-        };
+        const getAverage = (arr) => arr.reduce((acc, n) => acc + n) / arr.length;
 
-        for (let key in chars) {
-          let item = chars[key];
+        for (const key in chars) {
+          const item = chars[key];
+          const obj = { id: 0, value: '' };
 
-          let obj = { id: 0, value: '' };
+          [obj.id] = item;
 
-          obj.id = item[0];
           obj.value = getAverage(item.slice(1)).toString();
 
           chars[key] = obj;
@@ -104,7 +107,7 @@ const reviews = (req, res) => {
       const constructMeta = (reviews, tracker) => {
         const reviewsUniq = [];
 
-        for (let key in tracker) {
+        for (const key in tracker) {
           reviewsUniq.push(tracker[key][0]);
         }
 
@@ -127,7 +130,7 @@ const reviews = (req, res) => {
             meta.ratings[item.rating]++;
           }
 
-          for (let key in meta.ratings) {
+          for (const key in meta.ratings) {
             meta.ratings[key] = meta.ratings[key].toString();
           }
 
@@ -139,7 +142,7 @@ const reviews = (req, res) => {
 
       output.meta = constructMeta(result, reviewsTracker);
 
-      for (let review in reviewsTracker) {
+      for (const review in reviewsTracker) {
         const item = reviewsTracker[review][0];
 
         if (item.response === 'null') {

@@ -7,5 +7,6 @@ reviewsRouter.get('/product/:productId/', reviewsController.getReviews);
 reviewsRouter.get('/product/:productId/:sortMethod', reviewsController.getReviews);
 
 reviewsRouter.put('/:reviewId/helpful', reviewsController.markReviewHelpful);
+reviewsRouter.put('/:reviewId/report', reviewsController.reportReview);
 
 module.exports = reviewsRouter;

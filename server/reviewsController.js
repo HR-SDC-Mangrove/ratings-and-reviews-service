@@ -10,7 +10,7 @@ const getReviews = (req, res) => {
 
   const query = `
   SELECT
-    reviews.id AS reviews_id, reviews.rating, reviews.summary, reviews.recommend, reviews.response, reviews.body, to_timestamp(reviews.date / 1000) AS date, reviews.reviewer_name, reviews.helpfulness, reviews_characteristics.value AS characteristics_value, reviews_characteristics.characteristic_id AS characteristics_id, characteristics.name AS characteristics_name, products.name AS product_name,
+    reviews.id AS reviews_id, reviews.rating, reviews.summary, reviews.recommend, reviews.response, reviews.body, to_timestamp(reviews.date / 1000) AS date, reviews.reviewer_name, reviews.helpfulness, reviews.reported, reviews_characteristics.value AS characteristics_value, reviews_characteristics.characteristic_id AS characteristics_id, characteristics.name AS characteristics_name, products.name AS product_name,
     CASE WHEN EXISTS (SELECT reviews_photos.url FROM reviews_photos WHERE reviews_photos.review_id = reviews.id)
       THEN (SELECT reviews_photos.url FROM reviews_photos WHERE reviews_photos.review_id = reviews.id)
       ELSE ''
@@ -145,27 +145,29 @@ const getReviews = (req, res) => {
       for (const review in reviewsTracker) {
         const item = reviewsTracker[review][0];
 
-        if (item.response === 'null') {
-          item.response = null;
+        if (!item.reported) {
+          if (item.response === 'null') {
+            item.response = null;
+          }
+
+          const reviewObj = {
+            review_id: item.reviews_id,
+            rating: item.rating,
+            summary: item.summary,
+            recommend: item.recommend,
+            response: item.response,
+            body: item.body,
+            date: JSON.stringify(item.date).slice(1, -1),
+            reviewer_name: item.reviewer_name,
+            helpfulness: item.helpfulness,
+            photos: extractPhotos(reviewsTracker[review]),
+          };
+
+          output.results.push(reviewObj);
         }
-
-        const reviewObj = {
-          review_id: item.reviews_id,
-          rating: item.rating,
-          summary: item.summary,
-          recommend: item.recommend,
-          response: item.response,
-          body: item.body,
-          date: JSON.stringify(item.date).slice(1, -1),
-          reviewer_name: item.reviewer_name,
-          helpfulness: item.helpfulness,
-          photos: extractPhotos(reviewsTracker[review]),
-        };
-
-        output.results.push(reviewObj);
       }
 
-      console.log(output);
+      // console.log(output);
       res.send(output);
     })
     .catch((err) => {
@@ -184,7 +186,25 @@ const markReviewHelpful = (req, res) => {
 
   db.any(query, reviewId)
     .then(() => {
-      res.send(200);
+      res.sendStatus(204);
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+};
+
+const reportReview = (req, res) => {
+  const { reviewId } = req.params;
+
+  const query = `
+  UPDATE reviews
+  SET reported = TRUE
+  WHERE id=$1
+  ;`;
+
+  db.any(query, reviewId)
+    .then(() => {
+      res.sendStatus(204);
     })
     .catch((err) => {
       console.log(err);
@@ -194,12 +214,12 @@ const markReviewHelpful = (req, res) => {
 module.exports = {
   getReviews,
   markReviewHelpful,
+  reportReview,
 };
 
 /*
 TODO:
 add routes:
--report review
 -post new review
 
 -add evergreen data for potential failing requests

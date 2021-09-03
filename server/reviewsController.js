@@ -167,7 +167,7 @@ const getReviews = (req, res) => {
         }
       }
 
-      // console.log(output);
+      console.log(output);
       res.send(output);
     })
     .catch((err) => {
@@ -211,20 +211,57 @@ const reportReview = (req, res) => {
     });
 };
 
+const postNewReview = (req, res) => {
+  //must account for characteristics and photos tables...
+
+  const productId = req.body.product_id || 1;
+
+  console.log('entered post new review for product id: ', productId);
+
+  let query = `
+  INSERT INTO reviews()
+  VALUES($1)
+  ;`;
+
+  let query2 = `
+  SELECT *
+  FROM reviews
+  WHERE id=1
+  ;`;
+
+  let query3 = `
+  SELECT *
+  FROM reviews_characteristics
+  WHERE id=1
+  ;`;
+
+  let query4 = `
+  SELECT *
+  FROM reviews_photos
+  WHERE id=1
+  ;`;
+
+  db.any(query2, productId)
+    .then((result) => {
+      console.log('post result', result);
+      // res.sendStatus(201);
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+};
+
 module.exports = {
   getReviews,
   markReviewHelpful,
   reportReview,
+  postNewReview,
 };
 
 /*
 TODO:
-add routes:
--post new review
-
+-add post new review route
 -add evergreen data for potential failing requests
-
 -add tests (K6?)
-
 -implement 'sort by' feature (relevance, newness, helpfulness)
 */

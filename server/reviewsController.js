@@ -186,5 +186,7 @@ add routes:
 
 -add evergreen data for potential failing requests
 
+-add tests (K6?)
+
 -implement 'sort by' feature (relevance, newness, helpfulness)
 */

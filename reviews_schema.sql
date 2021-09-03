@@ -85,3 +85,54 @@ EXPLAIN ANALYZE SELECT * from CHARACTERISTICS WHERE id=1000000;
 EXPLAIN ANALYZE SELECT * from PRODUCTS WHERE id=1;
 EXPLAIN ANALYZE SELECT * from PRODUCTS WHERE id=10000;
 EXPLAIN ANALYZE SELECT * from PRODUCTS WHERE id=1000000;
+
+EXPLAIN ANALYZE SELECT
+    reviews.id AS reviews_id, reviews.rating, reviews.summary, reviews.recommend, reviews.response, reviews.body, to_timestamp(reviews.date / 1000) AS date, reviews.reviewer_name, reviews.helpfulness, reviews_characteristics.value AS characteristics_value, reviews_characteristics.characteristic_id AS characteristics_id, characteristics.name AS characteristics_name, products.name AS product_name,
+    CASE WHEN EXISTS (SELECT reviews_photos.url FROM reviews_photos WHERE reviews_photos.review_id = reviews.id)
+      THEN (SELECT reviews_photos.url FROM reviews_photos WHERE reviews_photos.review_id = reviews.id)
+      ELSE ''
+    END AS photo_url,
+    CASE WHEN EXISTS (SELECT reviews_photos.id FROM reviews_photos WHERE reviews_photos.review_id = reviews.id)
+      THEN (SELECT id FROM reviews_photos WHERE reviews_photos.review_id = reviews.id)
+      ELSE NULL
+    END AS photo_id
+  FROM reviews, reviews_characteristics, characteristics, products
+  WHERE reviews.product_id = 47421
+  AND reviews_characteristics.review_id = reviews.id
+  AND characteristics.id = reviews_characteristics.characteristic_id
+  AND reviews.product_id = products.id
+  GROUP BY reviews.id, reviews_characteristics.value, characteristics.name, products.name, reviews_characteristics.characteristic_id;
+
+EXPLAIN ANALYZE SELECT
+    reviews.id AS reviews_id, reviews.rating, reviews.summary, reviews.recommend, reviews.response, reviews.body, to_timestamp(reviews.date / 1000) AS date, reviews.reviewer_name, reviews.helpfulness, reviews_characteristics.value AS characteristics_value, reviews_characteristics.characteristic_id AS characteristics_id, characteristics.name AS characteristics_name, products.name AS product_name,
+    CASE WHEN EXISTS (SELECT reviews_photos.url FROM reviews_photos WHERE reviews_photos.review_id = reviews.id)
+      THEN (SELECT reviews_photos.url FROM reviews_photos WHERE reviews_photos.review_id = reviews.id)
+      ELSE ''
+    END AS photo_url,
+    CASE WHEN EXISTS (SELECT reviews_photos.id FROM reviews_photos WHERE reviews_photos.review_id = reviews.id)
+      THEN (SELECT id FROM reviews_photos WHERE reviews_photos.review_id = reviews.id)
+      ELSE NULL
+    END AS photo_id
+  FROM reviews, reviews_characteristics, characteristics, products
+  WHERE reviews.product_id = 1
+  AND reviews_characteristics.review_id = reviews.id
+  AND characteristics.id = reviews_characteristics.characteristic_id
+  AND reviews.product_id = products.id
+  GROUP BY reviews.id, reviews_characteristics.value, characteristics.name, products.name, reviews_characteristics.characteristic_id;
+
+EXPLAIN ANALYZE SELECT
+    reviews.id AS reviews_id, reviews.rating, reviews.summary, reviews.recommend, reviews.response, reviews.body, to_timestamp(reviews.date / 1000) AS date, reviews.reviewer_name, reviews.helpfulness, reviews_characteristics.value AS characteristics_value, reviews_characteristics.characteristic_id AS characteristics_id, characteristics.name AS characteristics_name, products.name AS product_name,
+    CASE WHEN EXISTS (SELECT reviews_photos.url FROM reviews_photos WHERE reviews_photos.review_id = reviews.id)
+      THEN (SELECT reviews_photos.url FROM reviews_photos WHERE reviews_photos.review_id = reviews.id)
+      ELSE ''
+    END AS photo_url,
+    CASE WHEN EXISTS (SELECT reviews_photos.id FROM reviews_photos WHERE reviews_photos.review_id = reviews.id)
+      THEN (SELECT id FROM reviews_photos WHERE reviews_photos.review_id = reviews.id)
+      ELSE NULL
+    END AS photo_id
+  FROM reviews, reviews_characteristics, characteristics, products
+  WHERE reviews.product_id = 100000
+  AND reviews_characteristics.review_id = reviews.id
+  AND characteristics.id = reviews_characteristics.characteristic_id
+  AND reviews.product_id = products.id
+  GROUP BY reviews.id, reviews_characteristics.value, characteristics.name, products.name, reviews_characteristics.characteristic_id;

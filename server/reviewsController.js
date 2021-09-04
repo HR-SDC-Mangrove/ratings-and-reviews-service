@@ -12,11 +12,11 @@ const getReviews = (req, res) => {
   SELECT
     reviews.id AS reviews_id, reviews.rating, reviews.summary, reviews.recommend, reviews.response, reviews.body, to_timestamp(reviews.date / 1000) AS date, reviews.reviewer_name, reviews.helpfulness, reviews.reported, reviews_characteristics.value AS characteristics_value, reviews_characteristics.characteristic_id AS characteristics_id, characteristics.name AS characteristics_name, products.name AS product_name,
     CASE WHEN EXISTS (SELECT reviews_photos.url FROM reviews_photos WHERE reviews_photos.review_id = reviews.id)
-      THEN (SELECT reviews_photos.url FROM reviews_photos WHERE reviews_photos.review_id = reviews.id)
+      THEN (SELECT reviews_photos.url FROM reviews_photos WHERE reviews_photos.review_id = reviews.id LIMIT 1)
       ELSE ''
     END AS photo_url,
     CASE WHEN EXISTS (SELECT reviews_photos.id FROM reviews_photos WHERE reviews_photos.review_id = reviews.id)
-      THEN (SELECT id FROM reviews_photos WHERE reviews_photos.review_id = reviews.id)
+      THEN (SELECT id FROM reviews_photos WHERE reviews_photos.review_id = reviews.id LIMIT 1)
       ELSE NULL
     END AS photo_id
   FROM reviews, reviews_characteristics, characteristics, products
@@ -36,7 +36,6 @@ const getReviews = (req, res) => {
 
   db.any(query, productId)
     .then((result) => {
-      // console.log(result);
       output.productName = result[0].product_name;
 
       const reviewsTracker = {};
@@ -218,6 +217,44 @@ const postNewReview = (req, res) => {
 
   console.log('received post data for product id', productId, ': ', data);
 
+  const photos = [
+    'testIMG1',
+    'testIMG2',
+  ];
+
+  const characteristics = {1: 1, 2: 2, 3: 3, 4: 4};
+
+  const constructPhotoQueries = (photos) => {
+    let output = 'VALUES ';
+
+    for (let i = 0; i < photos.length; i++) {
+      const count = i + 1;
+
+      const str = `((SELECT max(id) FROM reviews_photos) + ${count}, (SELECT id FROM ins1), '${photos[i]}'),`;
+
+      output += str;
+    }
+
+    return output.slice(0, -1);
+  };
+
+  // VALUES((SELECT max(id) FROM reviews_characteristics) + 1, 158622, (SELECT id FROM ins1), 4)
+  const constructCharacteristicQueries = (chars) => {
+    let output = 'VALUES ';
+
+    let count = 1;
+
+    for (const key in chars) {
+      const str = `((SELECT max(id) FROM reviews_characteristics) + ${count}, ${key}, (SELECT id FROM ins1), ${chars[key]}),`;
+
+      output += str;
+
+      count++;
+    }
+
+    return output.slice(0, -1);
+  };
+
   // TODO: add ability to UNNEST arrays/objects for photos/characteristics in below single query
   const reviewQuery = `
   WITH ins1 AS (
@@ -227,16 +264,18 @@ const postNewReview = (req, res) => {
     )
   ,ins2 AS (
     INSERT INTO reviews_photos(id, review_id, url)
-    VALUES((SELECT max(id) FROM reviews_photos) + 1, (SELECT id FROM ins1), 'testurl.com')
-    RETURNING review_id
+    ${constructPhotoQueries(data.photos)}
     )
   INSERT INTO reviews_characteristics(id, characteristic_id, review_id, value)
-  VALUES((SELECT max(id) FROM reviews_characteristics) + 1, 158622, (SELECT id FROM ins1), 4)
+  ${constructCharacteristicQueries(data.characteristics)}
+  RETURNING (SELECT id AS review_id FROM ins1)
   ;`;
+
+  console.log(reviewQuery);
 
   db.any(reviewQuery)
     .then((result) => {
-      console.log('post result', result);
+      console.log('post result for REVIEW ID: ', result);
 
       res.sendStatus(201);
     })
@@ -246,7 +285,7 @@ const postNewReview = (req, res) => {
 };
 
 const testReview = (req, res) => {
-  const newQuery2 = `
+  const newQuery = `
   SELECT *
   FROM reviews, reviews_photos, reviews_characteristics
   WHERE reviews.product_id=47421
@@ -254,7 +293,19 @@ const testReview = (req, res) => {
   AND reviews_characteristics.review_id = reviews.id
   ;`;
 
-  db.any(newQuery2)
+  const newQuery2 = `
+  SELECT *
+  FROM reviews_photos
+  WHERE review_id=5774959
+  ;`;
+
+  const newQuery3 = `
+  SELECT *
+  FROM reviews_characteristics
+  WHERE review_id=5774959
+  ;`;
+
+  db.any(newQuery)
     .then((result) => {
       console.log('test result', result);
       res.sendStatus(201);

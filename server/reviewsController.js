@@ -168,6 +168,8 @@ const getReviews = (req, res) => {
       }
 
       // console.log(output);
+      // PROBLEM: only extracting one photo from array rather than all.
+      console.log(output.results[output.results.length - 1].photos);
       res.send(output);
     })
     .catch((err) => {
@@ -217,13 +219,6 @@ const postNewReview = (req, res) => {
 
   console.log('received post data for product id', productId, ': ', data);
 
-  const photos = [
-    'testIMG1',
-    'testIMG2',
-  ];
-
-  const characteristics = {1: 1, 2: 2, 3: 3, 4: 4};
-
   const constructPhotoQueries = (photos) => {
     let output = 'VALUES ';
 
@@ -238,7 +233,6 @@ const postNewReview = (req, res) => {
     return output.slice(0, -1);
   };
 
-  // VALUES((SELECT max(id) FROM reviews_characteristics) + 1, 158622, (SELECT id FROM ins1), 4)
   const constructCharacteristicQueries = (chars) => {
     let output = 'VALUES ';
 
@@ -255,7 +249,6 @@ const postNewReview = (req, res) => {
     return output.slice(0, -1);
   };
 
-  // TODO: add ability to UNNEST arrays/objects for photos/characteristics in below single query
   const reviewQuery = `
   WITH ins1 AS (
     INSERT INTO reviews(id, product_id, rating, date, summary, body, recommend, reported, reviewer_name, reviewer_email, response, helpfulness)
@@ -268,10 +261,10 @@ const postNewReview = (req, res) => {
     )
   INSERT INTO reviews_characteristics(id, characteristic_id, review_id, value)
   ${constructCharacteristicQueries(data.characteristics)}
-  RETURNING (SELECT id AS review_id FROM ins1)
+  RETURNING (SELECT id AS review_id FROM ins1 LIMIT 1)
   ;`;
 
-  console.log(reviewQuery);
+  // console.log(reviewQuery);
 
   db.any(reviewQuery)
     .then((result) => {
@@ -296,13 +289,13 @@ const testReview = (req, res) => {
   const newQuery2 = `
   SELECT *
   FROM reviews_photos
-  WHERE review_id=5774959
+  WHERE review_id=5774955
   ;`;
 
   const newQuery3 = `
   SELECT *
   FROM reviews_characteristics
-  WHERE review_id=5774959
+  WHERE review_id=5774955
   ;`;
 
   db.any(newQuery)

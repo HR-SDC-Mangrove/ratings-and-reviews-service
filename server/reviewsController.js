@@ -36,6 +36,7 @@ const getReviews = (req, res) => {
 
   db.any(query, productId)
     .then((result) => {
+      // console.log(result);
       output.productName = result[0].product_name;
 
       const reviewsTracker = {};
@@ -167,7 +168,7 @@ const getReviews = (req, res) => {
         }
       }
 
-      console.log(output);
+      // console.log(output);
       res.send(output);
     })
     .catch((err) => {
@@ -212,39 +213,51 @@ const reportReview = (req, res) => {
 };
 
 const postNewReview = (req, res) => {
-  //must account for characteristics and photos tables...
+  const data = req.body;
+  const productId = data.product_id || 1;
 
-  const productId = req.body.product_id || 1;
+  console.log('received post data for product id', productId, ': ', data);
 
-  console.log('entered post new review for product id: ', productId);
-
-  let query = `
-  INSERT INTO reviews()
-  VALUES($1)
+  // TODO: add ability to UNNEST arrays/objects for photos/characteristics in below single query
+  const reviewQuery = `
+  WITH ins1 AS (
+    INSERT INTO reviews(id, product_id, rating, date, summary, body, recommend, reported, reviewer_name, reviewer_email, response, helpfulness)
+    VALUES((SELECT max(id) FROM reviews) + 1, ${data.product_id}, ${data.rating}, ROUND(EXTRACT(EPOCH FROM NOW())::float*1000), '${data.summary}', '${data.body}', ${data.recommend}, FALSE, '${data.name}', '${data.email}', '', 0)
+    RETURNING id
+    )
+  ,ins2 AS (
+    INSERT INTO reviews_photos(id, review_id, url)
+    VALUES((SELECT max(id) FROM reviews_photos) + 1, (SELECT id FROM ins1), 'testurl.com')
+    RETURNING review_id
+    )
+  INSERT INTO reviews_characteristics(id, characteristic_id, review_id, value)
+  VALUES((SELECT max(id) FROM reviews_characteristics) + 1, 158622, (SELECT id FROM ins1), 4)
   ;`;
 
-  let query2 = `
-  SELECT *
-  FROM reviews
-  WHERE id=1
-  ;`;
-
-  let query3 = `
-  SELECT *
-  FROM reviews_characteristics
-  WHERE id=1
-  ;`;
-
-  let query4 = `
-  SELECT *
-  FROM reviews_photos
-  WHERE id=1
-  ;`;
-
-  db.any(query2, productId)
+  db.any(reviewQuery)
     .then((result) => {
       console.log('post result', result);
-      // res.sendStatus(201);
+
+      res.sendStatus(201);
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+};
+
+const testReview = (req, res) => {
+  const newQuery2 = `
+  SELECT *
+  FROM reviews, reviews_photos, reviews_characteristics
+  WHERE reviews.product_id=47421
+  AND reviews_photos.review_id = reviews.id
+  AND reviews_characteristics.review_id = reviews.id
+  ;`;
+
+  db.any(newQuery2)
+    .then((result) => {
+      console.log('test result', result);
+      res.sendStatus(201);
     })
     .catch((err) => {
       console.log(err);
@@ -256,6 +269,7 @@ module.exports = {
   markReviewHelpful,
   reportReview,
   postNewReview,
+  testReview,
 };
 
 /*

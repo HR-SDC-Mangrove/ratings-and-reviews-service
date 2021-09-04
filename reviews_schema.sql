@@ -2,7 +2,7 @@ DROP SCHEMA IF EXISTS reviews CASCADE;
 
 CREATE SCHEMA reviews
   CREATE TABLE reviews(
-    id INTEGER NOT NULL PRIMARY KEY,
+    id SERIAL PRIMARY KEY,
     product_id INTEGER,
     rating INTEGER,
     date BIGINT,
@@ -19,7 +19,7 @@ CREATE SCHEMA reviews
   CREATE INDEX ON reviews(product_id)
 
   CREATE TABLE reviews_photos(
-    id INTEGER NOT NULL PRIMARY KEY,
+    id SERIAL PRIMARY KEY,
     review_id INTEGER,
     url TEXT
   )
@@ -27,7 +27,7 @@ CREATE SCHEMA reviews
   CREATE INDEX ON reviews_photos(review_id)
 
   CREATE TABLE reviews_characteristics(
-    id INTEGER NOT NULL PRIMARY KEY,
+    id SERIAL PRIMARY KEY,
     characteristic_id INTEGER,
     review_id INTEGER,
     value INTEGER
@@ -36,7 +36,7 @@ CREATE SCHEMA reviews
   CREATE INDEX ON reviews_characteristics(review_id)
 
   CREATE TABLE characteristics(
-    id INTEGER NOT NULL PRIMARY KEY,
+    id SERIAL PRIMARY KEY,
     product_id INTEGER,
     name TEXT
   )
@@ -44,7 +44,7 @@ CREATE SCHEMA reviews
   CREATE INDEX ON characteristics(id)
 
   CREATE TABLE products(
-    id INTEGER NOT NULL PRIMARY KEY,
+    id SERIAL PRIMARY KEY,
     name TEXT,
     slogan TEXT,
     description TEXT,

@@ -1,5 +1,8 @@
 /* eslint-disable no-undef */
 const assert = require('assert');
+const chai = require('chai');
+const express = require('express');
+const request = require('supertest');
 
 describe('Array', () => {
   describe('#indexOf()', () => {

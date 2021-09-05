@@ -5,7 +5,7 @@ const pgp = require('pg-promise')(initOptions);
 
 const helpers = require('./dbHelpers');
 
-const cn = `postgres://sunikkim:${process.env.DB_PASSWORD}@localhost:5432/reviews`;
+const cn = `postgres://${process.env.DB_USER}:${process.env.DB_PASSWORD}@${process.env.DB_URL}:${process.env.DB_PORT}/reviews`;
 const db = pgp(cn);
 
 const getReviews = (productId) => {

@@ -160,7 +160,6 @@ const getReviews = (req, res) => {
           output.results.push(reviewObj);
         }
       }
-      // console.log(output);
       res.send(output);
     })
     .catch((err) => {
@@ -206,9 +205,6 @@ const reportReview = (req, res) => {
 
 const postNewReview = (req, res) => {
   const data = req.body;
-  const productId = data.product_id || 1;
-
-  console.log('received post data for product id', productId, ': ', data);
 
   const constructPhotoQueries = (photos) => {
     let output = 'VALUES ';
@@ -253,8 +249,7 @@ const postNewReview = (req, res) => {
   ;`;
 
   db.any(reviewQuery)
-    .then((result) => {
-      console.log('post result for REVIEW ID: ', result);
+    .then(() => {
       res.sendStatus(201);
     })
     .catch((err) => {

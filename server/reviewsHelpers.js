@@ -90,7 +90,60 @@ const constructMeta = (reviews, tracker, productId) => {
   return meta;
 };
 
+const formatReviews = (result, productId) => {
+  const output = {
+    product: productId,
+    productName: '',
+    meta: {},
+    results: [],
+  };
+
+  output.productName = result[0].product_name;
+
+  const reviewsTracker = {};
+
+  for (let i = 0; i < result.length; i++) {
+    const item = result[i];
+
+    if (!reviewsTracker[item.reviews_id]) {
+      reviewsTracker[item.reviews_id] = [item];
+    } else if (reviewsTracker[item.reviews_id]) {
+      reviewsTracker[item.reviews_id].push(item);
+    }
+  }
+
+  output.meta = constructMeta(result, reviewsTracker, productId);
+
+  for (const review in reviewsTracker) {
+    const item = reviewsTracker[review][0];
+
+    if (!item.reported) {
+      if (item.response === 'null') {
+        item.response = null;
+      }
+
+      const reviewObj = {
+        review_id: item.reviews_id,
+        rating: item.rating,
+        summary: item.summary,
+        recommend: item.recommend,
+        response: item.response,
+        body: item.body,
+        date: JSON.stringify(item.date).slice(1, -1),
+        reviewer_name: item.reviewer_name,
+        helpfulness: item.helpfulness,
+        photos: extractPhotos(reviewsTracker[review]),
+      };
+
+      output.results.push(reviewObj);
+    }
+  }
+
+  return output;
+};
+
 module.exports = {
+  formatReviews,
   extractPhotos,
   extractCharacteristics,
   constructMeta,

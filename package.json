@@ -4,8 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "nyc mocha",
-    "start": "nodemon server/index.js"
+    "test": "mocha",
+    "start": "nodemon server/index.js",
+    "coverage": "nyc --reporter=text mocha"
   },
   "repository": {
     "type": "git",

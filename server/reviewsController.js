@@ -11,22 +11,44 @@ const getReviews = (req, res) => {
   // PROBLEM: only extracting one photo from array rather than all. (LIMIT 1) - err: more than one row returned by a subquery used as an expression. must edit subqueries to be able to return more than one result.
   const query = `
   SELECT
-    reviews.id AS reviews_id, reviews.rating, reviews.summary, reviews.recommend, reviews.response, reviews.body, to_timestamp(reviews.date / 1000) AS date, reviews.reviewer_name, reviews.helpfulness, reviews.reported, reviews_characteristics.value AS characteristics_value, reviews_characteristics.characteristic_id AS characteristics_id, characteristics.name AS characteristics_name, products.name AS product_name,
-    CASE WHEN EXISTS (SELECT reviews_photos.url FROM reviews_photos WHERE reviews_photos.review_id = reviews.id)
-      THEN (SELECT reviews_photos.url FROM reviews_photos WHERE reviews_photos.review_id = reviews.id)
-      ELSE ''
-    END AS photo_url,
-    CASE WHEN EXISTS (SELECT reviews_photos.id FROM reviews_photos WHERE reviews_photos.review_id = reviews.id)
-      THEN (SELECT id FROM reviews_photos WHERE reviews_photos.review_id = reviews.id)
-      ELSE NULL
-    END AS photo_id
+    reviews.id AS reviews_id, reviews.rating, reviews.summary, reviews.recommend, reviews.response, reviews.body, to_timestamp(reviews.date / 1000) AS date, reviews.reviewer_name, reviews.helpfulness, reviews.reported, reviews_characteristics.value AS characteristics_value, reviews_characteristics.characteristic_id AS characteristics_id, characteristics.name AS characteristics_name, products.name AS product_name, reviews_photos.url AS photo_url, reviews_photos.id AS photo_id
   FROM reviews, reviews_characteristics, characteristics, products
+  LEFT JOIN reviews_photos
+  ON reviews_photos.review_id = reviews.id
   WHERE reviews.product_id = $1
   AND reviews_characteristics.review_id = reviews.id
   AND characteristics.id = reviews_characteristics.characteristic_id
   AND reviews.product_id = products.id
-  GROUP BY reviews.id, reviews_characteristics.value, characteristics.name, products.name, reviews_characteristics.characteristic_id
   ;`;
+
+  // this query works on its own. find way to merge with above.
+  const photoQuery = `
+  SELECT
+    reviews_photos.url AS photo_url, reviews_photos.id AS photo_id, reviews_photos.review_id
+  FROM reviews
+  LEFT JOIN reviews_photos
+  ON reviews_photos.review_id = reviews.id
+  WHERE reviews.product_id = $1
+  ;`;
+
+  // const query = `
+  // SELECT
+  //   reviews.id AS reviews_id, reviews.rating, reviews.summary, reviews.recommend, reviews.response, reviews.body, to_timestamp(reviews.date / 1000) AS date, reviews.reviewer_name, reviews.helpfulness, reviews.reported, reviews_characteristics.value AS characteristics_value, reviews_characteristics.characteristic_id AS characteristics_id, characteristics.name AS characteristics_name, products.name AS product_name,
+  //   CASE WHEN EXISTS (SELECT reviews_photos.url FROM reviews_photos WHERE reviews_photos.review_id = reviews.id)
+  //     THEN (SELECT reviews_photos.url FROM reviews_photos WHERE reviews_photos.review_id = reviews.id)
+  //     ELSE ''
+  //   END AS photo_url,
+  //   CASE WHEN EXISTS (SELECT reviews_photos.id FROM reviews_photos WHERE reviews_photos.review_id = reviews.id)
+  //     THEN (SELECT id FROM reviews_photos WHERE reviews_photos.review_id = reviews.id)
+  //     ELSE NULL
+  //   END AS photo_id
+  // FROM reviews, reviews_characteristics, characteristics, products
+  // WHERE reviews.product_id = $1
+  // AND reviews_characteristics.review_id = reviews.id
+  // AND characteristics.id = reviews_characteristics.characteristic_id
+  // AND reviews.product_id = products.id
+  // GROUP BY reviews.id, reviews_characteristics.value, characteristics.name, products.name, reviews_characteristics.characteristic_id
+  // ;`;
 
   const output = {
     product: productId,
@@ -35,8 +57,12 @@ const getReviews = (req, res) => {
     results: [],
   };
 
-  db.any(query, productId)
+  db.any(photoQuery, productId)
     .then((result) => {
+      console.log(result);
+
+      return;
+
       output.productName = result[0].product_name;
 
       const reviewsTracker = {};

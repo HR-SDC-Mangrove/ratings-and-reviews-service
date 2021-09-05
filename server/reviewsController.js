@@ -8,15 +8,16 @@ const { db } = require('../database/index');
 const getReviews = (req, res) => {
   const { productId } = req.params;
 
+  // PROBLEM: only extracting one photo from array rather than all. (LIMIT 1) - err: more than one row returned by a subquery used as an expression. must edit subqueries to be able to return more than one result.
   const query = `
   SELECT
     reviews.id AS reviews_id, reviews.rating, reviews.summary, reviews.recommend, reviews.response, reviews.body, to_timestamp(reviews.date / 1000) AS date, reviews.reviewer_name, reviews.helpfulness, reviews.reported, reviews_characteristics.value AS characteristics_value, reviews_characteristics.characteristic_id AS characteristics_id, characteristics.name AS characteristics_name, products.name AS product_name,
     CASE WHEN EXISTS (SELECT reviews_photos.url FROM reviews_photos WHERE reviews_photos.review_id = reviews.id)
-      THEN (SELECT reviews_photos.url FROM reviews_photos WHERE reviews_photos.review_id = reviews.id LIMIT 1)
+      THEN (SELECT reviews_photos.url FROM reviews_photos WHERE reviews_photos.review_id = reviews.id)
       ELSE ''
     END AS photo_url,
     CASE WHEN EXISTS (SELECT reviews_photos.id FROM reviews_photos WHERE reviews_photos.review_id = reviews.id)
-      THEN (SELECT id FROM reviews_photos WHERE reviews_photos.review_id = reviews.id LIMIT 1)
+      THEN (SELECT id FROM reviews_photos WHERE reviews_photos.review_id = reviews.id)
       ELSE NULL
     END AS photo_id
   FROM reviews, reviews_characteristics, characteristics, products
@@ -95,7 +96,6 @@ const getReviews = (req, res) => {
           const obj = { id: 0, value: '' };
 
           [obj.id] = item;
-
           obj.value = getAverage(item.slice(1)).toString();
 
           chars[key] = obj;
@@ -166,10 +166,7 @@ const getReviews = (req, res) => {
           output.results.push(reviewObj);
         }
       }
-
       // console.log(output);
-      // PROBLEM: only extracting one photo from array rather than all.
-      console.log(output.results[output.results.length - 1].photos);
       res.send(output);
     })
     .catch((err) => {
@@ -224,7 +221,6 @@ const postNewReview = (req, res) => {
 
     for (let i = 0; i < photos.length; i++) {
       const count = i + 1;
-
       const str = `((SELECT max(id) FROM reviews_photos) + ${count}, (SELECT id FROM ins1), '${photos[i]}'),`;
 
       output += str;
@@ -235,14 +231,12 @@ const postNewReview = (req, res) => {
 
   const constructCharacteristicQueries = (chars) => {
     let output = 'VALUES ';
-
     let count = 1;
 
     for (const key in chars) {
       const str = `((SELECT max(id) FROM reviews_characteristics) + ${count}, ${key}, (SELECT id FROM ins1), ${chars[key]}),`;
 
       output += str;
-
       count++;
     }
 
@@ -261,15 +255,12 @@ const postNewReview = (req, res) => {
     )
   INSERT INTO reviews_characteristics(id, characteristic_id, review_id, value)
   ${constructCharacteristicQueries(data.characteristics)}
-  RETURNING (SELECT id AS review_id FROM ins1 LIMIT 1)
+  RETURNING (SELECT id AS review_id FROM ins1)
   ;`;
-
-  // console.log(reviewQuery);
 
   db.any(reviewQuery)
     .then((result) => {
       console.log('post result for REVIEW ID: ', result);
-
       res.sendStatus(201);
     })
     .catch((err) => {
@@ -289,16 +280,28 @@ const testReview = (req, res) => {
   const newQuery2 = `
   SELECT *
   FROM reviews_photos
-  WHERE review_id=5774955
+  WHERE review_id=5774954
   ;`;
 
   const newQuery3 = `
   SELECT *
   FROM reviews_characteristics
-  WHERE review_id=5774955
+  WHERE review_id=5774954
   ;`;
 
-  db.any(newQuery)
+  const newQuery4 = `
+  SELECT reviews_photos.url
+  FROM reviews_photos
+  WHERE reviews_photos.review_id = 5774954
+  ;`;
+
+  const newQuery5 = `
+  SELECT id
+  FROM reviews_photos
+  WHERE reviews_photos.review_id = 5774954
+  ;`;
+
+  db.any(newQuery5)
     .then((result) => {
       console.log('test result', result);
       res.sendStatus(201);

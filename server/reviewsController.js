@@ -262,55 +262,11 @@ const postNewReview = (req, res) => {
     });
 };
 
-const testReview = (req, res) => {
-  const newQuery = `
-  SELECT *
-  FROM reviews, reviews_photos, reviews_characteristics
-  WHERE reviews.product_id=47421
-  AND reviews_photos.review_id = reviews.id
-  AND reviews_characteristics.review_id = reviews.id
-  ;`;
-
-  const newQuery2 = `
-  SELECT *
-  FROM reviews_photos
-  WHERE review_id=5774954
-  ;`;
-
-  const newQuery3 = `
-  SELECT *
-  FROM reviews_characteristics
-  WHERE review_id=5774954
-  ;`;
-
-  const newQuery4 = `
-  SELECT reviews_photos.url
-  FROM reviews_photos
-  WHERE reviews_photos.review_id = 5774954
-  ;`;
-
-  const newQuery5 = `
-  SELECT id
-  FROM reviews_photos
-  WHERE reviews_photos.review_id = 5774954
-  ;`;
-
-  db.any(newQuery5)
-    .then((result) => {
-      console.log('test result', result);
-      res.sendStatus(201);
-    })
-    .catch((err) => {
-      console.log(err);
-    });
-};
-
 module.exports = {
   getReviews,
   markReviewHelpful,
   reportReview,
   postNewReview,
-  testReview,
 };
 
 /*

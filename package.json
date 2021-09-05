@@ -6,7 +6,7 @@
   "scripts": {
     "test": "mocha",
     "start": "nodemon server/index.js",
-    "coverage": "nyc --reporter=text mocha"
+    "coverage": "nyc --reporter=text --all mocha"
   },
   "repository": {
     "type": "git",

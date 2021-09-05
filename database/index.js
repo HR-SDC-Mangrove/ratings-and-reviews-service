@@ -74,7 +74,6 @@ const postNewReview = (data) => {
 };
 
 module.exports = {
-  db,
   getReviews,
   markReviewHelpful,
   reportReview,

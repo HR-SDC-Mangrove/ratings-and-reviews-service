@@ -3,6 +3,7 @@ const initOptions = {
 };
 
 const pgp = require('pg-promise')(initOptions);
+
 const cn = `postgres://sunikkim:${process.env.DB_PASSWORD}@localhost:5432/reviews`;
 const db = pgp(cn);
 

@@ -66,25 +66,25 @@ SET search_path TO reviews;
 
 \copy reviews_photos(id, review_id, url) from '/Users/sunikkim/Desktop/coding/HR-IMMERSIVE/SDC-DATA/reviews_photos.csv' delimiter ',' csv header;
 
-EXPLAIN ANALYZE SELECT * from REVIEWS WHERE product_id=1;
-EXPLAIN ANALYZE SELECT * from REVIEWS WHERE product_id=10000;
-EXPLAIN ANALYZE SELECT * from REVIEWS WHERE product_id=1000000;
+EXPLAIN ANALYZE SELECT * FROM reviews WHERE product_id=1;
+EXPLAIN ANALYZE SELECT * FROM reviews WHERE product_id=10000;
+EXPLAIN ANALYZE SELECT * FROM reviews WHERE product_id=1000000;
 
-EXPLAIN ANALYZE SELECT * from REVIEWS_PHOTOS WHERE review_id=1;
-EXPLAIN ANALYZE SELECT * from REVIEWS_PHOTOS WHERE review_id=10000;
-EXPLAIN ANALYZE SELECT * from REVIEWS_PHOTOS WHERE review_id=1000000;
+EXPLAIN ANALYZE SELECT * FROM reviews_photos WHERE review_id=1;
+EXPLAIN ANALYZE SELECT * FROM reviews_photos WHERE review_id=10000;
+EXPLAIN ANALYZE SELECT * FROM reviews_photos WHERE review_id=1000000;
 
-EXPLAIN ANALYZE SELECT * from REVIEWS_CHARACTERISTICS WHERE review_id=1;
-EXPLAIN ANALYZE SELECT * from REVIEWS_CHARACTERISTICS WHERE review_id=10000;
-EXPLAIN ANALYZE SELECT * from REVIEWS_CHARACTERISTICS WHERE review_id=1000000;
+EXPLAIN ANALYZE SELECT * FROM reviews_characteristics WHERE review_id=1;
+EXPLAIN ANALYZE SELECT * FROM reviews_characteristics WHERE review_id=10000;
+EXPLAIN ANALYZE SELECT * FROM reviews_characteristics WHERE review_id=1000000;
 
-EXPLAIN ANALYZE SELECT * from CHARACTERISTICS WHERE id=1;
-EXPLAIN ANALYZE SELECT * from CHARACTERISTICS WHERE id=10000;
-EXPLAIN ANALYZE SELECT * from CHARACTERISTICS WHERE id=1000000;
+EXPLAIN ANALYZE SELECT * FROM characteristics WHERE id=1;
+EXPLAIN ANALYZE SELECT * FROM characteristics WHERE id=10000;
+EXPLAIN ANALYZE SELECT * FROM characteristics WHERE id=1000000;
 
-EXPLAIN ANALYZE SELECT * from PRODUCTS WHERE id=1;
-EXPLAIN ANALYZE SELECT * from PRODUCTS WHERE id=10000;
-EXPLAIN ANALYZE SELECT * from PRODUCTS WHERE id=1000000;
+EXPLAIN ANALYZE SELECT * FROM products WHERE id=1;
+EXPLAIN ANALYZE SELECT * FROM products WHERE id=10000;
+EXPLAIN ANALYZE SELECT * FROM products WHERE id=1000000;
 
 EXPLAIN ANALYZE SELECT
     reviews.id AS reviews_id, reviews.rating, reviews.summary, reviews.recommend, reviews.response, reviews.body, to_timestamp(reviews.date / 1000) AS date, reviews.reviewer_name, reviews.helpfulness, reviews.reported, reviews_characteristics.value AS characteristics_value, reviews_characteristics.characteristic_id AS characteristics_id, characteristics.name AS characteristics_name, products.name AS product_name, reviews_photos.url AS photo_url, reviews_photos.id AS photo_id

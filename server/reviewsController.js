@@ -63,8 +63,6 @@ module.exports = {
 
 /*
 TODO:
--allow user to configure db connection using env file (currently hardcoded)
--add evergreen data for potential failing requests
 -add tests (K6?)
 -implement 'sort by' feature (relevance, newness, helpfulness)
 */

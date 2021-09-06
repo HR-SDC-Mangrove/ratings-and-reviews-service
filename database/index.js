@@ -1,11 +1,11 @@
 const initOptions = {
-  schema: 'reviews',
+  schema: process.env.DB_SCHEMA,
 };
 const pgp = require('pg-promise')(initOptions);
 
 const helpers = require('./dbHelpers');
 
-const cn = `postgres://${process.env.DB_USER}:${process.env.DB_PASSWORD}@${process.env.DB_URL}:${process.env.DB_PORT}/reviews`;
+const cn = `postgres://${process.env.DB_USER}:${process.env.DB_PASSWORD}@${process.env.DB_HOST}:${process.env.DB_PORT}/${process.env.DB_DATABASE}`;
 const db = pgp(cn);
 
 const getReviews = (productId) => {
@@ -23,7 +23,7 @@ const getReviews = (productId) => {
   AND reviews.product_id = products.id
   ;`;
 
-  return db.any(query, productId);
+  return db.query(query, productId);
 };
 
 const markReviewHelpful = (reviewId) => {
@@ -66,6 +66,7 @@ const postNewReview = (data) => {
 };
 
 module.exports = {
+  db,
   getReviews,
   markReviewHelpful,
   reportReview,

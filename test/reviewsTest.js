@@ -1,14 +1,13 @@
 /* eslint-disable no-undef */
-// const assert = require('assert');
-// const chai = require('chai');
 const { expect } = require('chai');
-const supertest = require('supertest');
 const request = require('supertest')('http://localhost:8080/reviews');
+// eslint-disable-next-line no-unused-vars
+const app = require('../server/index');
+const sampleData = require('./mockData');
 
 const db = require('../database/index');
 const dbHelpers = require('../database/dbHelpers');
 const reviewsHelpers = require('../server/reviewsHelpers');
-const reviewsController = require('../server/reviewsController');
 
 describe('GET /reviews', () => {
   it('returns correct reviews in correct format for valid product id', async () => {
@@ -35,7 +34,7 @@ describe('report review', () => {
 describe('POST new review', () => {
   it('successfully posts new review', async () => {
     const response = await request.post('/').send({
-      product_id: 47421,
+      product_id: 50000,
       rating: 5,
       summary: 'MOCHACHAITEST',
       body: 'MOCHACHAITESTING',
@@ -74,7 +73,7 @@ describe('db getReviews', () => {
   it('returns reviews from db', () => {
     db.getReviews(47421)
       .then((result) => {
-        expect(result).to.exist;
+        expect(result).to.not.eql(null);
       });
   });
 });
@@ -83,7 +82,7 @@ describe('db markReviewHelpful', () => {
   it('marks review helpful', () => {
     db.markReviewHelpful(273027)
       .then((result) => {
-        expect(result).to.exist;
+        expect(result).to.not.eql(null);
       });
   });
 });
@@ -92,7 +91,7 @@ describe('db reportReview', () => {
   it('reports review', () => {
     db.reportReview(47421)
       .then((result) => {
-        expect(result).to.exist;
+        expect(result).to.not.eql(null);
       });
   });
 });
@@ -100,10 +99,10 @@ describe('db reportReview', () => {
 describe('db postNewReview', () => {
   it('posts new review', () => {
     const data = {
-      product_id: 47421,
+      product_id: 50000,
       rating: 5,
-      summary: 'MOCHACHAITEST',
-      body: 'MOCHACHAITESTING',
+      summary: 'MOCHACHAITEST????',
+      body: 'MOCHACHAITESTING????',
       recommend: true,
       name: 'test',
       email: 'test@test.com',
@@ -115,16 +114,14 @@ describe('db postNewReview', () => {
 
     db.postNewReview(data)
       .then((result) => {
-        expect(result).to.exist;
+        expect(result).to.not.eql(null);
       });
   });
 });
 
-// describe('server routes', () => {
-//   it('runs get route', (done) => {
-//     const app = supertest('../server/index');
-//     app.get('/product/47421')
-//       .set('Accept', 'application/json')
-//       .expect(200, done);
-//   });
-// });
+describe('formatReview', () => {
+  it('formats reviews', () => {
+    const result = reviewsHelpers.formatReviews(sampleData, 47421);
+    expect(result.results.length).to.not.eql(0);
+  });
+});

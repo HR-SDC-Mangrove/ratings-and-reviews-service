@@ -2,6 +2,7 @@
 // const assert = require('assert');
 // const chai = require('chai');
 const { expect } = require('chai');
+const supertest = require('supertest');
 const request = require('supertest')('http://localhost:8080/reviews');
 
 const db = require('../database/index');
@@ -118,3 +119,12 @@ describe('db postNewReview', () => {
       });
   });
 });
+
+// describe('server routes', () => {
+//   it('runs get route', (done) => {
+//     const app = supertest('../server/index');
+//     app.get('/product/47421')
+//       .set('Accept', 'application/json')
+//       .expect(200, done);
+//   });
+// });

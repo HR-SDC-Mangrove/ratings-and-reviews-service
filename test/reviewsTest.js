@@ -2,7 +2,7 @@
 const { expect } = require('chai');
 const request = require('supertest')('http://localhost:8080/reviews');
 // eslint-disable-next-line no-unused-vars
-const app = require('../server/index');
+// const app = require('../server/index');
 const sampleData = require('./mockData');
 
 const db = require('../database/index');

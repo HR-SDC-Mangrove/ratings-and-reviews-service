@@ -23,9 +23,7 @@ const getReviews = (productId) => {
   AND reviews.product_id = products.id
   ;`;
 
-  return db.any(query, productId)
-    .then((result) => result)
-    .catch((err) => err);
+  return db.any(query, productId);
 };
 
 const markReviewHelpful = (reviewId) => {
@@ -35,9 +33,7 @@ const markReviewHelpful = (reviewId) => {
   WHERE id=$1
   ;`;
 
-  return db.any(query, reviewId)
-    .then((result) => result)
-    .catch((err) => err);
+  return db.any(query, reviewId);
 };
 
 const reportReview = (reviewId) => {
@@ -47,9 +43,7 @@ const reportReview = (reviewId) => {
   WHERE id=$1
   ;`;
 
-  return db.any(query, reviewId)
-    .then((result) => result)
-    .catch((err) => err);
+  return db.any(query, reviewId);
 };
 
 const postNewReview = (data) => {
@@ -68,9 +62,7 @@ const postNewReview = (data) => {
   RETURNING (SELECT id AS review_id FROM ins1)
   ;`;
 
-  return db.any(query)
-    .then((result) => result)
-    .catch((err) => err);
+  return db.any(query);
 };
 
 module.exports = {

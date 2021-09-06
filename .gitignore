@@ -3,3 +3,4 @@ mongooseSchema.js
 postgresETL.js
 local_schemas
 .env
+.nyc_output

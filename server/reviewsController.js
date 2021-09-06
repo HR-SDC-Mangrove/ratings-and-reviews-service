@@ -63,6 +63,5 @@ module.exports = {
 
 /*
 TODO:
--add tests (mocha/chai for unit/integration. istanbul for code coverage. K6 for load testing)
 -implement 'sort by' feature (relevance, newness, helpfulness)
 */

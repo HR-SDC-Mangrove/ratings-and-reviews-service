@@ -129,16 +129,3 @@ EXPLAIN ANALYZE UPDATE reviews
 EXPLAIN ANALYZE UPDATE reviews
   SET reported = TRUE
   WHERE id=1;
-
--- EXPLAIN ANALYZE WITH ins1 AS (
---     INSERT INTO reviews(id, product_id, rating, date, summary, body, recommend, reported, reviewer_name, reviewer_email, response, helpfulness)
---     VALUES((SELECT max(id) FROM reviews) + 1, 1, 5, ROUND(EXTRACT(EPOCH FROM NOW())::float*1000), 'summary', 'body', TRUE, FALSE, 'name', 'email', '', 0)
---     RETURNING id
---     )
---   ,ins2 AS (
---     INSERT INTO reviews_photos(id, review_id, url)
---     VALUES (1,1,'test1.com'), (2,1,'test2.com'), (3,1,'test3.com'), (4,1,'test4.com')
---     )
---   INSERT INTO reviews_characteristics(id, characteristic_id, review_id, value)
---   VALUES (1,1,1,1), (2,2,1,1), (3,3,1,1), (4,4,1,1)
---   RETURNING (SELECT id AS review_id FROM ins1);

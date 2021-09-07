@@ -11,7 +11,7 @@ const app = require('../server/server');
 
 const port = 8000;
 
-const sampleData = require('./mockData');
+const { sampleData } = require('./mockData');
 
 const db = require('../database/index');
 const dbHelpers = require('../database/dbHelpers');
@@ -38,7 +38,16 @@ describe('server routes', () => {
       });
   });
 
-  it('mark review helpful route', (done) => {
+  it('get route returns valid evergreen data for invalid product id', (done) => {
+    chai.request(app)
+      .get('/reviews/product/474211401401924081901024/newest')
+      .end((err, res) => {
+        expect(res.text).to.include('productName');
+        done();
+      });
+  });
+
+  it('mark review helpful route works for valid review id', (done) => {
     chai.request(app)
       .put('/reviews/50000/helpful')
       .end((err, res) => {
@@ -47,7 +56,16 @@ describe('server routes', () => {
       });
   });
 
-  it('report review route', (done) => {
+  it('mark review helpful route returns relevant error message for invalid review id', (done) => {
+    chai.request(app)
+      .put('/reviews/500000000000000/helpful')
+      .end((err, res) => {
+        expect(res.text).to.include('An unexpected error occurred');
+        done();
+      });
+  });
+
+  it('report review route works for valid review id', (done) => {
     chai.request(app)
       .put('/reviews/50000/report')
       .end((err, res) => {
@@ -56,7 +74,16 @@ describe('server routes', () => {
       });
   });
 
-  it('post review route', (done) => {
+  it('report review route returns relevant error message for invalid review id', (done) => {
+    chai.request(app)
+      .put('/reviews/500000000000000000/report')
+      .end((err, res) => {
+        expect(res.text).to.include('An unexpected error occurred');
+        done();
+      });
+  });
+
+  it('post review route works for valid product id', (done) => {
     chai.request(app)
       .post('/reviews/')
       .send({
@@ -74,6 +101,28 @@ describe('server routes', () => {
       })
       .end((err, res) => {
         expect(res.statusCode).to.eql(201);
+        done();
+      });
+  });
+
+  it('post review route returns relevant error message for invalid product id', (done) => {
+    chai.request(app)
+      .post('/reviews/')
+      .send({
+        product_id: 500000000000000,
+        rating: 5,
+        summary: 'MOCHACHAITEST',
+        body: 'MOCHACHAITESTING',
+        recommend: true,
+        name: 'test',
+        email: 'test@test.com',
+        characteristics: {
+          158622: 1, 158623: 1, 158624: 1, 158625: 1,
+        },
+        photos: ['test1.com', 'test2.com', 'test3.com', 'test4.com'],
+      })
+      .end((err, res) => {
+        expect(res.text).to.include('An unexpected error occurred');
         done();
       });
   });

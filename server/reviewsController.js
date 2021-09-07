@@ -4,6 +4,7 @@
 /* eslint-disable no-plusplus */
 const db = require('../database/index');
 const helpers = require('./reviewsHelpers');
+const { evergreenData } = require('../test/mockData');
 
 const getReviews = (req, res) => {
   const { productId, sortMethod } = req.params;
@@ -13,8 +14,8 @@ const getReviews = (req, res) => {
       const output = helpers.formatReviews(result, productId, sortMethod);
       res.send(output);
     })
-    .catch((err) => {
-      res.status(400).send(err);
+    .catch(() => {
+      res.status(400).send(evergreenData);
     });
 };
 
@@ -25,8 +26,8 @@ const markReviewHelpful = (req, res) => {
     .then(() => {
       res.sendStatus(204);
     })
-    .catch((err) => {
-      res.status(400).send(err);
+    .catch(() => {
+      res.status(400).send('An unexpected error occurred: could not mark this review helpful');
     });
 };
 
@@ -37,8 +38,8 @@ const reportReview = (req, res) => {
     .then(() => {
       res.sendStatus(204);
     })
-    .catch((err) => {
-      res.status(400).send(err);
+    .catch(() => {
+      res.status(400).send('An unexpected error occurred: could not report this review');
     });
 };
 
@@ -49,8 +50,8 @@ const postNewReview = (req, res) => {
     .then(() => {
       res.sendStatus(201);
     })
-    .catch((err) => {
-      res.status(400).send(err);
+    .catch(() => {
+      res.status(400).send('An unexpected error occurred: could not post this review');
     });
 };
 

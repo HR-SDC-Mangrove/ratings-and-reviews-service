@@ -91,7 +91,7 @@ describe('GET /reviews', () => {
   });
 
   it('returns correct reviews in correct format for valid product id 47421', async () => {
-    const response = await request.get('/product/47421/relevancce');
+    const response = await request.get('/product/47421/relevance');
     expect(response.body.product).to.eql('47421');
     expect(response.body.results.length).to.not.eql(0);
   });

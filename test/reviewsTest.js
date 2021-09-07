@@ -18,9 +18,19 @@ const dbHelpers = require('../database/dbHelpers');
 const reviewsHelpers = require('../server/reviewsHelpers');
 
 describe('server routes', () => {
-  it('get route returns product info', (done) => {
+  it('get route returns product info sorted by relevance', (done) => {
     chai.request(app)
-      .get('/reviews/product/47421')
+      .get('/reviews/product/47421/relevance')
+      .end((err, res) => {
+        expect(res.text).to.include('Rhett Jacket');
+        expect(res.text).to.include('47421');
+        done();
+      });
+  });
+
+  it('get route returns product info sorted by newest', (done) => {
+    chai.request(app)
+      .get('/reviews/product/47421/newest')
       .end((err, res) => {
         expect(res.text).to.include('Rhett Jacket');
         expect(res.text).to.include('47421');
@@ -81,31 +91,31 @@ describe('GET /reviews', () => {
   });
 
   it('returns correct reviews in correct format for valid product id 47421', async () => {
-    const response = await request.get('/product/47421');
+    const response = await request.get('/product/47421/relevancce');
     expect(response.body.product).to.eql('47421');
     expect(response.body.results.length).to.not.eql(0);
   });
 
   it('returns correct reviews in correct format for valid product id 47425', async () => {
-    const response = await request.get('/product/47425');
+    const response = await request.get('/product/47425/helpfulness');
     expect(response.body.product).to.eql('47425');
     expect(response.body.results.length).to.not.eql(0);
   });
 
   it('returns correct reviews in correct format for valid product id 50001', async () => {
-    const response = await request.get('/product/50001');
+    const response = await request.get('/product/50001/newest');
     expect(response.body.product).to.eql('50001');
     expect(response.body.results.length).to.not.eql(0);
   });
 
   it('returns correct reviews in correct format for valid product id 1', async () => {
-    const response = await request.get('/product/1');
+    const response = await request.get('/product/1/relevance');
     expect(response.body.product).to.eql('1');
     expect(response.body.results.length).to.not.eql(0);
   });
 
   it('returns correct reviews in correct format for valid product id 100000', async () => {
-    const response = await request.get('/product/100000');
+    const response = await request.get('/product/100000/helpfulness');
     expect(response.body.product).to.eql('100000');
     expect(response.body.results.length).to.not.eql(0);
   });

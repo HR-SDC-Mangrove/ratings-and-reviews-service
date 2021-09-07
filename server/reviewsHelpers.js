@@ -91,9 +91,6 @@ const constructMeta = (reviews, tracker, productId) => {
 };
 
 const formatReviews = (result, productId, sortMethod) => {
-  // implement different sortMethods
-  console.log('SORT METHOD: ', sortMethod);
-
   const output = {
     product: productId,
     productName: '',
@@ -140,6 +137,10 @@ const formatReviews = (result, productId, sortMethod) => {
 
       output.results.push(reviewObj);
     }
+  }
+
+  if (sortMethod === 'newest') {
+    output.results.sort((a, b) => Date.parse(b.date) - Date.parse(a.date));
   }
 
   return output;

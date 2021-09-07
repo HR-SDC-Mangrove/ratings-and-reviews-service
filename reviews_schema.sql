@@ -2,7 +2,7 @@ DROP SCHEMA IF EXISTS reviews CASCADE;
 
 CREATE SCHEMA reviews
   CREATE TABLE reviews(
-    id INTEGER NOT NULL PRIMARY KEY,
+    id SERIAL PRIMARY KEY,
     product_id INTEGER,
     rating INTEGER,
     date BIGINT,
@@ -19,7 +19,7 @@ CREATE SCHEMA reviews
   CREATE INDEX ON reviews(product_id)
 
   CREATE TABLE reviews_photos(
-    id INTEGER NOT NULL PRIMARY KEY,
+    id SERIAL PRIMARY KEY,
     review_id INTEGER,
     url TEXT
   )
@@ -27,7 +27,7 @@ CREATE SCHEMA reviews
   CREATE INDEX ON reviews_photos(review_id)
 
   CREATE TABLE reviews_characteristics(
-    id INTEGER NOT NULL PRIMARY KEY,
+    id SERIAL PRIMARY KEY,
     characteristic_id INTEGER,
     review_id INTEGER,
     value INTEGER
@@ -36,7 +36,7 @@ CREATE SCHEMA reviews
   CREATE INDEX ON reviews_characteristics(review_id)
 
   CREATE TABLE characteristics(
-    id INTEGER NOT NULL PRIMARY KEY,
+    id SERIAL PRIMARY KEY,
     product_id INTEGER,
     name TEXT
   )
@@ -44,7 +44,7 @@ CREATE SCHEMA reviews
   CREATE INDEX ON characteristics(id)
 
   CREATE TABLE products(
-    id INTEGER NOT NULL PRIMARY KEY,
+    id SERIAL PRIMARY KEY,
     name TEXT,
     slogan TEXT,
     description TEXT,
@@ -66,73 +66,79 @@ SET search_path TO reviews;
 
 \copy reviews_photos(id, review_id, url) from '/Users/sunikkim/Desktop/coding/HR-IMMERSIVE/SDC-DATA/reviews_photos.csv' delimiter ',' csv header;
 
-EXPLAIN ANALYZE SELECT * from REVIEWS WHERE product_id=1;
-EXPLAIN ANALYZE SELECT * from REVIEWS WHERE product_id=10000;
-EXPLAIN ANALYZE SELECT * from REVIEWS WHERE product_id=1000000;
+EXPLAIN ANALYZE SELECT * FROM reviews WHERE product_id=1;
+EXPLAIN ANALYZE SELECT * FROM reviews WHERE product_id=10000;
+EXPLAIN ANALYZE SELECT * FROM reviews WHERE product_id=1000000;
 
-EXPLAIN ANALYZE SELECT * from REVIEWS_PHOTOS WHERE review_id=1;
-EXPLAIN ANALYZE SELECT * from REVIEWS_PHOTOS WHERE review_id=10000;
-EXPLAIN ANALYZE SELECT * from REVIEWS_PHOTOS WHERE review_id=1000000;
+EXPLAIN ANALYZE SELECT * FROM reviews_photos WHERE review_id=1;
+EXPLAIN ANALYZE SELECT * FROM reviews_photos WHERE review_id=10000;
+EXPLAIN ANALYZE SELECT * FROM reviews_photos WHERE review_id=1000000;
 
-EXPLAIN ANALYZE SELECT * from REVIEWS_CHARACTERISTICS WHERE review_id=1;
-EXPLAIN ANALYZE SELECT * from REVIEWS_CHARACTERISTICS WHERE review_id=10000;
-EXPLAIN ANALYZE SELECT * from REVIEWS_CHARACTERISTICS WHERE review_id=1000000;
+EXPLAIN ANALYZE SELECT * FROM reviews_characteristics WHERE review_id=1;
+EXPLAIN ANALYZE SELECT * FROM reviews_characteristics WHERE review_id=10000;
+EXPLAIN ANALYZE SELECT * FROM reviews_characteristics WHERE review_id=1000000;
 
-EXPLAIN ANALYZE SELECT * from CHARACTERISTICS WHERE id=1;
-EXPLAIN ANALYZE SELECT * from CHARACTERISTICS WHERE id=10000;
-EXPLAIN ANALYZE SELECT * from CHARACTERISTICS WHERE id=1000000;
+EXPLAIN ANALYZE SELECT * FROM characteristics WHERE id=1;
+EXPLAIN ANALYZE SELECT * FROM characteristics WHERE id=10000;
+EXPLAIN ANALYZE SELECT * FROM characteristics WHERE id=1000000;
 
-EXPLAIN ANALYZE SELECT * from PRODUCTS WHERE id=1;
-EXPLAIN ANALYZE SELECT * from PRODUCTS WHERE id=10000;
-EXPLAIN ANALYZE SELECT * from PRODUCTS WHERE id=1000000;
+EXPLAIN ANALYZE SELECT * FROM products WHERE id=1;
+EXPLAIN ANALYZE SELECT * FROM products WHERE id=10000;
+EXPLAIN ANALYZE SELECT * FROM products WHERE id=1000000;
 
 EXPLAIN ANALYZE SELECT
-    reviews.id AS reviews_id, reviews.rating, reviews.summary, reviews.recommend, reviews.response, reviews.body, to_timestamp(reviews.date / 1000) AS date, reviews.reviewer_name, reviews.helpfulness, reviews_characteristics.value AS characteristics_value, reviews_characteristics.characteristic_id AS characteristics_id, characteristics.name AS characteristics_name, products.name AS product_name,
-    CASE WHEN EXISTS (SELECT reviews_photos.url FROM reviews_photos WHERE reviews_photos.review_id = reviews.id)
-      THEN (SELECT reviews_photos.url FROM reviews_photos WHERE reviews_photos.review_id = reviews.id)
-      ELSE ''
-    END AS photo_url,
-    CASE WHEN EXISTS (SELECT reviews_photos.id FROM reviews_photos WHERE reviews_photos.review_id = reviews.id)
-      THEN (SELECT id FROM reviews_photos WHERE reviews_photos.review_id = reviews.id)
-      ELSE NULL
-    END AS photo_id
-  FROM reviews, reviews_characteristics, characteristics, products
+    reviews.id AS reviews_id, reviews.rating, reviews.summary, reviews.recommend, reviews.response, reviews.body, to_timestamp(reviews.date / 1000) AS date, reviews.reviewer_name, reviews.helpfulness, reviews.reported, reviews_characteristics.value AS characteristics_value, reviews_characteristics.characteristic_id AS characteristics_id, characteristics.name AS characteristics_name, products.name AS product_name, reviews_photos.url AS photo_url, reviews_photos.id AS photo_id
+  FROM
+    reviews
+      LEFT JOIN reviews_photos
+        ON reviews_photos.review_id = reviews.id,
+    reviews_characteristics, characteristics, products
   WHERE reviews.product_id = 47421
   AND reviews_characteristics.review_id = reviews.id
   AND characteristics.id = reviews_characteristics.characteristic_id
-  AND reviews.product_id = products.id
-  GROUP BY reviews.id, reviews_characteristics.value, characteristics.name, products.name, reviews_characteristics.characteristic_id;
+  AND reviews.product_id = products.id;
 
 EXPLAIN ANALYZE SELECT
-    reviews.id AS reviews_id, reviews.rating, reviews.summary, reviews.recommend, reviews.response, reviews.body, to_timestamp(reviews.date / 1000) AS date, reviews.reviewer_name, reviews.helpfulness, reviews_characteristics.value AS characteristics_value, reviews_characteristics.characteristic_id AS characteristics_id, characteristics.name AS characteristics_name, products.name AS product_name,
-    CASE WHEN EXISTS (SELECT reviews_photos.url FROM reviews_photos WHERE reviews_photos.review_id = reviews.id)
-      THEN (SELECT reviews_photos.url FROM reviews_photos WHERE reviews_photos.review_id = reviews.id)
-      ELSE ''
-    END AS photo_url,
-    CASE WHEN EXISTS (SELECT reviews_photos.id FROM reviews_photos WHERE reviews_photos.review_id = reviews.id)
-      THEN (SELECT id FROM reviews_photos WHERE reviews_photos.review_id = reviews.id)
-      ELSE NULL
-    END AS photo_id
-  FROM reviews, reviews_characteristics, characteristics, products
+    reviews.id AS reviews_id, reviews.rating, reviews.summary, reviews.recommend, reviews.response, reviews.body, to_timestamp(reviews.date / 1000) AS date, reviews.reviewer_name, reviews.helpfulness, reviews.reported, reviews_characteristics.value AS characteristics_value, reviews_characteristics.characteristic_id AS characteristics_id, characteristics.name AS characteristics_name, products.name AS product_name, reviews_photos.url AS photo_url, reviews_photos.id AS photo_id
+  FROM
+    reviews
+      LEFT JOIN reviews_photos
+        ON reviews_photos.review_id = reviews.id,
+    reviews_characteristics, characteristics, products
   WHERE reviews.product_id = 1
   AND reviews_characteristics.review_id = reviews.id
   AND characteristics.id = reviews_characteristics.characteristic_id
-  AND reviews.product_id = products.id
-  GROUP BY reviews.id, reviews_characteristics.value, characteristics.name, products.name, reviews_characteristics.characteristic_id;
+  AND reviews.product_id = products.id;
 
 EXPLAIN ANALYZE SELECT
-    reviews.id AS reviews_id, reviews.rating, reviews.summary, reviews.recommend, reviews.response, reviews.body, to_timestamp(reviews.date / 1000) AS date, reviews.reviewer_name, reviews.helpfulness, reviews_characteristics.value AS characteristics_value, reviews_characteristics.characteristic_id AS characteristics_id, characteristics.name AS characteristics_name, products.name AS product_name,
-    CASE WHEN EXISTS (SELECT reviews_photos.url FROM reviews_photos WHERE reviews_photos.review_id = reviews.id)
-      THEN (SELECT reviews_photos.url FROM reviews_photos WHERE reviews_photos.review_id = reviews.id)
-      ELSE ''
-    END AS photo_url,
-    CASE WHEN EXISTS (SELECT reviews_photos.id FROM reviews_photos WHERE reviews_photos.review_id = reviews.id)
-      THEN (SELECT id FROM reviews_photos WHERE reviews_photos.review_id = reviews.id)
-      ELSE NULL
-    END AS photo_id
-  FROM reviews, reviews_characteristics, characteristics, products
-  WHERE reviews.product_id = 100000
+    reviews.id AS reviews_id, reviews.rating, reviews.summary, reviews.recommend, reviews.response, reviews.body, to_timestamp(reviews.date / 1000) AS date, reviews.reviewer_name, reviews.helpfulness, reviews.reported, reviews_characteristics.value AS characteristics_value, reviews_characteristics.characteristic_id AS characteristics_id, characteristics.name AS characteristics_name, products.name AS product_name, reviews_photos.url AS photo_url, reviews_photos.id AS photo_id
+  FROM
+    reviews
+      LEFT JOIN reviews_photos
+        ON reviews_photos.review_id = reviews.id,
+    reviews_characteristics, characteristics, products
+  WHERE reviews.product_id = 1000000
   AND reviews_characteristics.review_id = reviews.id
   AND characteristics.id = reviews_characteristics.characteristic_id
-  AND reviews.product_id = products.id
-  GROUP BY reviews.id, reviews_characteristics.value, characteristics.name, products.name, reviews_characteristics.characteristic_id;
+  AND reviews.product_id = products.id;
+
+EXPLAIN ANALYZE UPDATE reviews
+  SET helpfulness = helpfulness + 1
+  WHERE id=1;
+
+EXPLAIN ANALYZE UPDATE reviews
+  SET reported = TRUE
+  WHERE id=1;
+
+-- EXPLAIN ANALYZE WITH ins1 AS (
+--     INSERT INTO reviews(id, product_id, rating, date, summary, body, recommend, reported, reviewer_name, reviewer_email, response, helpfulness)
+--     VALUES((SELECT max(id) FROM reviews) + 1, 1, 5, ROUND(EXTRACT(EPOCH FROM NOW())::float*1000), 'summary', 'body', TRUE, FALSE, 'name', 'email', '', 0)
+--     RETURNING id
+--     )
+--   ,ins2 AS (
+--     INSERT INTO reviews_photos(id, review_id, url)
+--     VALUES (1,1,'test1.com'), (2,1,'test2.com'), (3,1,'test3.com'), (4,1,'test4.com')
+--     )
+--   INSERT INTO reviews_characteristics(id, characteristic_id, review_id, value)
+--   VALUES (1,1,1,1), (2,2,1,1), (3,3,1,1), (4,4,1,1)
+--   RETURNING (SELECT id AS review_id FROM ins1);

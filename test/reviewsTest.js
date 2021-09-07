@@ -1,7 +1,12 @@
 /* eslint-disable no-undef */
 const { expect } = require('chai');
+const chai = require('chai');
 const request = require('supertest')('http://localhost:8080/reviews');
-// eslint-disable-next-line no-unused-vars
+
+const chaiHttp = require('chai-http');
+
+chai.use(chaiHttp);
+
 const app = require('../server/server');
 
 const port = 8000;
@@ -11,6 +16,58 @@ const sampleData = require('./mockData');
 const db = require('../database/index');
 const dbHelpers = require('../database/dbHelpers');
 const reviewsHelpers = require('../server/reviewsHelpers');
+
+describe('server routes', () => {
+  it('get route returns product info', (done) => {
+    chai.request(app)
+      .get('/reviews/product/47421')
+      .end((err, res) => {
+        expect(res.text).to.include('Rhett Jacket');
+        expect(res.text).to.include('47421');
+        done();
+      });
+  });
+
+  it('mark review helpful route', (done) => {
+    chai.request(app)
+      .put('/reviews/50000/helpful')
+      .end((err, res) => {
+        expect(res.statusCode).to.eql(204);
+        done();
+      });
+  });
+
+  it('report review route', (done) => {
+    chai.request(app)
+      .put('/reviews/50000/report')
+      .end((err, res) => {
+        expect(res.statusCode).to.eql(204);
+        done();
+      });
+  });
+
+  it('post review route', (done) => {
+    chai.request(app)
+      .post('/reviews/')
+      .send({
+        product_id: 50000,
+        rating: 5,
+        summary: 'MOCHACHAITEST',
+        body: 'MOCHACHAITESTING',
+        recommend: true,
+        name: 'test',
+        email: 'test@test.com',
+        characteristics: {
+          158622: 1, 158623: 1, 158624: 1, 158625: 1,
+        },
+        photos: ['test1.com', 'test2.com', 'test3.com', 'test4.com'],
+      })
+      .end((err, res) => {
+        expect(res.statusCode).to.eql(201);
+        done();
+      });
+  });
+});
 
 describe('GET /reviews', () => {
   let server;
@@ -23,9 +80,33 @@ describe('GET /reviews', () => {
     server.close();
   });
 
-  it('returns correct reviews in correct format for valid product id', async () => {
+  it('returns correct reviews in correct format for valid product id 47421', async () => {
     const response = await request.get('/product/47421');
     expect(response.body.product).to.eql('47421');
+    expect(response.body.results.length).to.not.eql(0);
+  });
+
+  it('returns correct reviews in correct format for valid product id 47425', async () => {
+    const response = await request.get('/product/47425');
+    expect(response.body.product).to.eql('47425');
+    expect(response.body.results.length).to.not.eql(0);
+  });
+
+  it('returns correct reviews in correct format for valid product id 50001', async () => {
+    const response = await request.get('/product/50001');
+    expect(response.body.product).to.eql('50001');
+    expect(response.body.results.length).to.not.eql(0);
+  });
+
+  it('returns correct reviews in correct format for valid product id 1', async () => {
+    const response = await request.get('/product/1');
+    expect(response.body.product).to.eql('1');
+    expect(response.body.results.length).to.not.eql(0);
+  });
+
+  it('returns correct reviews in correct format for valid product id 100000', async () => {
+    const response = await request.get('/product/100000');
+    expect(response.body.product).to.eql('100000');
     expect(response.body.results.length).to.not.eql(0);
   });
 });

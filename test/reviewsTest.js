@@ -112,59 +112,75 @@ describe('constructCharacteristicQueries', () => {
   });
 });
 
-// describe('db getReviews', () => {
-//   it('returns reviews from db', () => {
-//     db.getReviews(47421)
-//       .then((result) => {
-//         expect(result).to.not.eql(null);
-//       });
-//   });
-// });
-
-// describe('db markReviewHelpful', () => {
-//   it('marks review helpful', () => {
-//     db.markReviewHelpful(273027)
-//       .then((result) => {
-//         expect(result).to.not.eql(null);
-//       });
-//   });
-// });
-
-// describe('db reportReview', () => {
-//   it('reports review', () => {
-//     db.reportReview(47421)
-//       .then((result) => {
-//         expect(result).to.not.eql(null);
-//       });
-//   });
-// });
-
-// describe('db postNewReview', () => {
-//   it('posts new review', () => {
-//     const data = {
-//       product_id: 50000,
-//       rating: 5,
-//       summary: 'MOCHACHAITEST????',
-//       body: 'MOCHACHAITESTING????',
-//       recommend: true,
-//       name: 'test',
-//       email: 'test@test.com',
-//       characteristics: {
-//         158622: 1, 158623: 1, 158624: 1, 158625: 1,
-//       },
-//       photos: ['test1.com', 'test2.com', 'test3.com', 'test4.com'],
-//     };
-
-//     db.postNewReview(data)
-//       .then((result) => {
-//         expect(result).to.not.eql(null);
-//       });
-//   });
-// });
-
 describe('formatReview', () => {
   it('formats reviews', () => {
     const result = reviewsHelpers.formatReviews(sampleData, 47421);
     expect(result.results.length).to.not.eql(0);
+  });
+});
+
+describe('db getReviews', () => {
+  afterEach(() => {
+    db.db.$pool.end();
+  });
+
+  it('returns correct reviews from db', () => {
+    db.getReviews(47421)
+      .then((result) => {
+        expect(result[0].product_name).to.eql('Rhett Jacket');
+      });
+  });
+});
+
+describe('db markReviewHelpful', () => {
+  afterEach(() => {
+    db.db.$pool.end();
+  });
+
+  it('marks review helpful', () => {
+    db.markReviewHelpful(273027)
+      .then((result) => {
+        expect(result).to.not.eql(null);
+      });
+  });
+});
+
+describe('db reportReview', () => {
+  afterEach(() => {
+    db.db.$pool.end();
+  });
+
+  it('reports review', () => {
+    db.reportReview(47421)
+      .then((result) => {
+        expect(result).to.not.eql(null);
+      });
+  });
+});
+
+describe('db postNewReview', () => {
+  afterEach(() => {
+    db.db.$pool.end();
+  });
+
+  it('posts new review', () => {
+    const data = {
+      product_id: 50000,
+      rating: 5,
+      summary: 'MOCHACHAITEST????',
+      body: 'MOCHACHAITESTING????',
+      recommend: true,
+      name: 'test',
+      email: 'test@test.com',
+      characteristics: {
+        158622: 1, 158623: 1, 158624: 1, 158625: 1,
+      },
+      photos: ['test1.com', 'test2.com', 'test3.com', 'test4.com'],
+    };
+
+    db.postNewReview(data)
+      .then((result) => {
+        expect(result[0].review_id).to.not.eql(null);
+      });
   });
 });

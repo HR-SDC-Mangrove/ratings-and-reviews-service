@@ -6,11 +6,11 @@ const db = require('../database/index');
 const helpers = require('./reviewsHelpers');
 
 const getReviews = (req, res) => {
-  const { productId } = req.params;
+  const { productId, sortMethod } = req.params;
 
   db.getReviews(productId)
     .then((result) => {
-      const output = helpers.formatReviews(result, productId);
+      const output = helpers.formatReviews(result, productId, sortMethod);
       res.send(output);
     })
     .catch((err) => {
@@ -60,8 +60,3 @@ module.exports = {
   reportReview,
   postNewReview,
 };
-
-/*
-TODO:
--implement 'sort by' feature (relevance, newness, helpfulness)
-*/

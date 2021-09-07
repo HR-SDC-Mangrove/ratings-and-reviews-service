@@ -90,7 +90,10 @@ const constructMeta = (reviews, tracker, productId) => {
   return meta;
 };
 
-const formatReviews = (result, productId) => {
+const formatReviews = (result, productId, sortMethod) => {
+  // implement different sortMethods
+  console.log('SORT METHOD: ', sortMethod);
+
   const output = {
     product: productId,
     productName: '',

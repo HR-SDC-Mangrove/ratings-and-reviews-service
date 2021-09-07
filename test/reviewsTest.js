@@ -2,7 +2,10 @@
 const { expect } = require('chai');
 const request = require('supertest')('http://localhost:8080/reviews');
 // eslint-disable-next-line no-unused-vars
-// const app = require('../server/index');
+const app = require('../server/server');
+
+const port = 8000;
+
 const sampleData = require('./mockData');
 
 const db = require('../database/index');
@@ -10,6 +13,16 @@ const dbHelpers = require('../database/dbHelpers');
 const reviewsHelpers = require('../server/reviewsHelpers');
 
 describe('GET /reviews', () => {
+  let server;
+
+  beforeEach(() => {
+    server = app.listen(port, () => {});
+  });
+
+  afterEach(() => {
+    server.close();
+  });
+
   it('returns correct reviews in correct format for valid product id', async () => {
     const response = await request.get('/product/47421');
     expect(response.body.product).to.eql('47421');
@@ -18,6 +31,16 @@ describe('GET /reviews', () => {
 });
 
 describe('mark review helpful', () => {
+  let server;
+
+  beforeEach(() => {
+    server = app.listen(port, () => {});
+  });
+
+  afterEach(() => {
+    server.close();
+  });
+
   it('successfully marks review helpful', async () => {
     const response = await request.put('/27027/helpful');
     expect(response.statusCode).to.eql(204);
@@ -25,6 +48,16 @@ describe('mark review helpful', () => {
 });
 
 describe('report review', () => {
+  let server;
+
+  beforeEach(() => {
+    server = app.listen(port, () => {});
+  });
+
+  afterEach(() => {
+    server.close();
+  });
+
   it('successfully reports review', async () => {
     const response = await request.put('/27027/report');
     expect(response.statusCode).to.eql(204);
@@ -32,6 +65,16 @@ describe('report review', () => {
 });
 
 describe('POST new review', () => {
+  let server;
+
+  beforeEach(() => {
+    server = app.listen(port, () => {});
+  });
+
+  afterEach(() => {
+    server.close();
+  });
+
   it('successfully posts new review', async () => {
     const response = await request.post('/').send({
       product_id: 50000,
@@ -69,55 +112,55 @@ describe('constructCharacteristicQueries', () => {
   });
 });
 
-describe('db getReviews', () => {
-  it('returns reviews from db', () => {
-    db.getReviews(47421)
-      .then((result) => {
-        expect(result).to.not.eql(null);
-      });
-  });
-});
+// describe('db getReviews', () => {
+//   it('returns reviews from db', () => {
+//     db.getReviews(47421)
+//       .then((result) => {
+//         expect(result).to.not.eql(null);
+//       });
+//   });
+// });
 
-describe('db markReviewHelpful', () => {
-  it('marks review helpful', () => {
-    db.markReviewHelpful(273027)
-      .then((result) => {
-        expect(result).to.not.eql(null);
-      });
-  });
-});
+// describe('db markReviewHelpful', () => {
+//   it('marks review helpful', () => {
+//     db.markReviewHelpful(273027)
+//       .then((result) => {
+//         expect(result).to.not.eql(null);
+//       });
+//   });
+// });
 
-describe('db reportReview', () => {
-  it('reports review', () => {
-    db.reportReview(47421)
-      .then((result) => {
-        expect(result).to.not.eql(null);
-      });
-  });
-});
+// describe('db reportReview', () => {
+//   it('reports review', () => {
+//     db.reportReview(47421)
+//       .then((result) => {
+//         expect(result).to.not.eql(null);
+//       });
+//   });
+// });
 
-describe('db postNewReview', () => {
-  it('posts new review', () => {
-    const data = {
-      product_id: 50000,
-      rating: 5,
-      summary: 'MOCHACHAITEST????',
-      body: 'MOCHACHAITESTING????',
-      recommend: true,
-      name: 'test',
-      email: 'test@test.com',
-      characteristics: {
-        158622: 1, 158623: 1, 158624: 1, 158625: 1,
-      },
-      photos: ['test1.com', 'test2.com', 'test3.com', 'test4.com'],
-    };
+// describe('db postNewReview', () => {
+//   it('posts new review', () => {
+//     const data = {
+//       product_id: 50000,
+//       rating: 5,
+//       summary: 'MOCHACHAITEST????',
+//       body: 'MOCHACHAITESTING????',
+//       recommend: true,
+//       name: 'test',
+//       email: 'test@test.com',
+//       characteristics: {
+//         158622: 1, 158623: 1, 158624: 1, 158625: 1,
+//       },
+//       photos: ['test1.com', 'test2.com', 'test3.com', 'test4.com'],
+//     };
 
-    db.postNewReview(data)
-      .then((result) => {
-        expect(result).to.not.eql(null);
-      });
-  });
-});
+//     db.postNewReview(data)
+//       .then((result) => {
+//         expect(result).to.not.eql(null);
+//       });
+//   });
+// });
 
 describe('formatReview', () => {
   it('formats reviews', () => {

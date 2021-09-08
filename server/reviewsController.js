@@ -7,11 +7,13 @@ const helpers = require('./reviewsHelpers');
 const { evergreenData } = require('../test/mockData');
 
 const getReviews = (req, res) => {
-  const { productId, sortMethod } = req.params;
+  const { productId } = req.params;
+  const sortMethod = req.query.sort;
+  const { count } = req.query;
 
   db.getReviews(productId)
     .then((result) => {
-      const output = helpers.formatReviews(result, productId, sortMethod);
+      const output = helpers.formatReviews(result, productId, sortMethod, count);
       res.send(output);
     })
     .catch(() => {

@@ -90,7 +90,7 @@ const constructMeta = (reviews, tracker, productId) => {
   return meta;
 };
 
-const formatReviews = (result, productId, sortMethod) => {
+const formatReviews = (result, productId, sortMethod, count) => {
   const output = {
     product: productId,
     productName: '',
@@ -141,6 +141,10 @@ const formatReviews = (result, productId, sortMethod) => {
 
   if (sortMethod === 'newest') {
     output.results.sort((a, b) => Date.parse(b.date) - Date.parse(a.date));
+  }
+
+  if (count) {
+    output.results = output.results.slice(0, count);
   }
 
   return output;

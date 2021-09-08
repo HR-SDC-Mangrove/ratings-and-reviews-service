@@ -94,6 +94,7 @@ const formatReviews = (result, productId, sortMethod, count) => {
   const output = {
     product: productId,
     productName: '',
+    count: count || 0,
     meta: {},
     results: [],
   };

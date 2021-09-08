@@ -9,7 +9,7 @@ const { evergreenData } = require('../test/mockData');
 const getReviews = (req, res) => {
   const { productId } = req.params;
   const sortMethod = req.query.sort;
-  const { count } = req.query;
+  const count = Number(req.query.count);
 
   db.getReviews(productId)
     .then((result) => {

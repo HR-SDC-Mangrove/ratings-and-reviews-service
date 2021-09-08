@@ -20,7 +20,7 @@ const reviewsHelpers = require('../server/reviewsHelpers');
 describe('server routes', () => {
   it('get route returns product info sorted by relevance', (done) => {
     chai.request(app)
-      .get('/reviews/product/47421/relevance')
+      .get('/reviews/product/47421?sort=relevance')
       .end((err, res) => {
         expect(res.text).to.include('Rhett Jacket');
         expect(res.text).to.include('47421');
@@ -30,7 +30,7 @@ describe('server routes', () => {
 
   it('get route returns product info sorted by newest', (done) => {
     chai.request(app)
-      .get('/reviews/product/47421/newest')
+      .get('/reviews/product/47421?sort=newest&count=50')
       .end((err, res) => {
         expect(res.text).to.include('Rhett Jacket');
         expect(res.text).to.include('47421');
@@ -40,7 +40,7 @@ describe('server routes', () => {
 
   it('get route returns valid evergreen data for invalid product id', (done) => {
     chai.request(app)
-      .get('/reviews/product/474211401401924081901024/newest')
+      .get('/reviews/product/474211401401924081901024?sort=newest')
       .end((err, res) => {
         expect(res.text).to.include('productName');
         done();
@@ -140,31 +140,31 @@ describe('GET /reviews', () => {
   });
 
   it('returns correct reviews in correct format for valid product id 47421', async () => {
-    const response = await request.get('/product/47421/relevance');
+    const response = await request.get('/product/47421?sort=relevance');
     expect(response.body.product).to.eql('47421');
     expect(response.body.results.length).to.not.eql(0);
   });
 
   it('returns correct reviews in correct format for valid product id 47425', async () => {
-    const response = await request.get('/product/47425/helpfulness');
+    const response = await request.get('/product/47425?sort=helpfulness');
     expect(response.body.product).to.eql('47425');
     expect(response.body.results.length).to.not.eql(0);
   });
 
   it('returns correct reviews in correct format for valid product id 50001', async () => {
-    const response = await request.get('/product/50001/newest');
+    const response = await request.get('/product/50001?sort=newest');
     expect(response.body.product).to.eql('50001');
     expect(response.body.results.length).to.not.eql(0);
   });
 
   it('returns correct reviews in correct format for valid product id 1', async () => {
-    const response = await request.get('/product/1/relevance');
+    const response = await request.get('/product/1?sort=relevance');
     expect(response.body.product).to.eql('1');
     expect(response.body.results.length).to.not.eql(0);
   });
 
   it('returns correct reviews in correct format for valid product id 100000', async () => {
-    const response = await request.get('/product/100000/helpfulness');
+    const response = await request.get('/product/100000?sort=helpfulness');
     expect(response.body.product).to.eql('100000');
     expect(response.body.results.length).to.not.eql(0);
   });

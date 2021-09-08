@@ -29,7 +29,9 @@ export default function () {
   sleep(1);
 
   const checkRes = check(res, {
-    'status is 200': (r) => r.status === 200,
+    'status is 200 (there are reviews for this product id)': (r) => r.status === 200,
+    'status is 400 (there are no reviews for this product id)': (r) => r.status === 400,
     'response body': (r) => r.body.length > 0 === true,
+    'sends valid data even if db request fails': (r) => r.body.includes('productName'),
   });
 }

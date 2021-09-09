@@ -50,14 +50,11 @@ const postNewReview = (data) => {
   const query = `
   WITH ins1 AS (
     INSERT INTO reviews(id, product_id, rating, date, summary, body, recommend, reported, reviewer_name, reviewer_email, response, helpfulness)
-    VALUES((SELECT max(id) FROM reviews) + 1, ${data.product_id}, ${data.rating}, ROUND(EXTRACT(EPOCH FROM NOW())::float*1000), '${data.summary}', '${data.body}', ${data.recommend}, FALSE, '${data.name}', '${data.email}', '', 0)
+    VALUES(DEFAULT, ${data.product_id}, ${data.rating}, ROUND(EXTRACT(EPOCH FROM NOW())::float*1000), '${data.summary}', '${data.body}', ${data.recommend}, FALSE, '${data.name}', '${data.email}', '', 0)
     RETURNING id
     )
-  ,ins2 AS (
-    INSERT INTO reviews_photos(id, review_id, url)
-    ${helpers.constructPhotoQueries(data.photos)}
-    )
-  INSERT INTO reviews_characteristics(id, characteristic_id, review_id, value)
+  ${helpers.constructPhotoQueries(data.photos)}
+  INSERT INTO reviews_characteristics(characteristic_id, review_id, value)
   ${helpers.constructCharacteristicQueries(data.characteristics)}
   RETURNING (SELECT id AS review_id FROM ins1)
   ;`;

@@ -66,66 +66,72 @@ SET search_path TO reviews;
 
 \copy reviews_photos(id, review_id, url) from '/Users/sunikkim/Desktop/coding/HR-IMMERSIVE/SDC-DATA/reviews_photos.csv' delimiter ',' csv header;
 
-EXPLAIN ANALYZE SELECT * FROM reviews WHERE product_id=1;
-EXPLAIN ANALYZE SELECT * FROM reviews WHERE product_id=10000;
-EXPLAIN ANALYZE SELECT * FROM reviews WHERE product_id=1000000;
+SELECT setval('reviews_id_seq', (SELECT MAX(id) FROM reviews));
+SELECT setval('reviews_photos_id_seq', (SELECT MAX(id) FROM reviews_photos));
+SELECT setval('reviews_characteristics_id_seq', (SELECT MAX(id) FROM reviews_characteristics));
+SELECT setval('characteristics_id_seq', (SELECT MAX(id) FROM characteristics));
+SELECT setval('products_id_seq', (SELECT MAX(id) FROM products));
 
-EXPLAIN ANALYZE SELECT * FROM reviews_photos WHERE review_id=1;
-EXPLAIN ANALYZE SELECT * FROM reviews_photos WHERE review_id=10000;
-EXPLAIN ANALYZE SELECT * FROM reviews_photos WHERE review_id=1000000;
+-- EXPLAIN ANALYZE SELECT * FROM reviews WHERE product_id=1;
+-- EXPLAIN ANALYZE SELECT * FROM reviews WHERE product_id=10000;
+-- EXPLAIN ANALYZE SELECT * FROM reviews WHERE product_id=1000000;
 
-EXPLAIN ANALYZE SELECT * FROM reviews_characteristics WHERE review_id=1;
-EXPLAIN ANALYZE SELECT * FROM reviews_characteristics WHERE review_id=10000;
-EXPLAIN ANALYZE SELECT * FROM reviews_characteristics WHERE review_id=1000000;
+-- EXPLAIN ANALYZE SELECT * FROM reviews_photos WHERE review_id=1;
+-- EXPLAIN ANALYZE SELECT * FROM reviews_photos WHERE review_id=10000;
+-- EXPLAIN ANALYZE SELECT * FROM reviews_photos WHERE review_id=1000000;
 
-EXPLAIN ANALYZE SELECT * FROM characteristics WHERE id=1;
-EXPLAIN ANALYZE SELECT * FROM characteristics WHERE id=10000;
-EXPLAIN ANALYZE SELECT * FROM characteristics WHERE id=1000000;
+-- EXPLAIN ANALYZE SELECT * FROM reviews_characteristics WHERE review_id=1;
+-- EXPLAIN ANALYZE SELECT * FROM reviews_characteristics WHERE review_id=10000;
+-- EXPLAIN ANALYZE SELECT * FROM reviews_characteristics WHERE review_id=1000000;
 
-EXPLAIN ANALYZE SELECT * FROM products WHERE id=1;
-EXPLAIN ANALYZE SELECT * FROM products WHERE id=10000;
-EXPLAIN ANALYZE SELECT * FROM products WHERE id=1000000;
+-- EXPLAIN ANALYZE SELECT * FROM characteristics WHERE id=1;
+-- EXPLAIN ANALYZE SELECT * FROM characteristics WHERE id=10000;
+-- EXPLAIN ANALYZE SELECT * FROM characteristics WHERE id=1000000;
 
-EXPLAIN ANALYZE SELECT
-    reviews.id AS reviews_id, reviews.rating, reviews.summary, reviews.recommend, reviews.response, reviews.body, to_timestamp(reviews.date / 1000) AS date, reviews.reviewer_name, reviews.helpfulness, reviews.reported, reviews_characteristics.value AS characteristics_value, reviews_characteristics.characteristic_id AS characteristics_id, characteristics.name AS characteristics_name, products.name AS product_name, reviews_photos.url AS photo_url, reviews_photos.id AS photo_id
-  FROM
-    reviews
-      LEFT JOIN reviews_photos
-        ON reviews_photos.review_id = reviews.id,
-    reviews_characteristics, characteristics, products
-  WHERE reviews.product_id = 47421
-  AND reviews_characteristics.review_id = reviews.id
-  AND characteristics.id = reviews_characteristics.characteristic_id
-  AND reviews.product_id = products.id;
+-- EXPLAIN ANALYZE SELECT * FROM products WHERE id=1;
+-- EXPLAIN ANALYZE SELECT * FROM products WHERE id=10000;
+-- EXPLAIN ANALYZE SELECT * FROM products WHERE id=1000000;
 
-EXPLAIN ANALYZE SELECT
-    reviews.id AS reviews_id, reviews.rating, reviews.summary, reviews.recommend, reviews.response, reviews.body, to_timestamp(reviews.date / 1000) AS date, reviews.reviewer_name, reviews.helpfulness, reviews.reported, reviews_characteristics.value AS characteristics_value, reviews_characteristics.characteristic_id AS characteristics_id, characteristics.name AS characteristics_name, products.name AS product_name, reviews_photos.url AS photo_url, reviews_photos.id AS photo_id
-  FROM
-    reviews
-      LEFT JOIN reviews_photos
-        ON reviews_photos.review_id = reviews.id,
-    reviews_characteristics, characteristics, products
-  WHERE reviews.product_id = 1
-  AND reviews_characteristics.review_id = reviews.id
-  AND characteristics.id = reviews_characteristics.characteristic_id
-  AND reviews.product_id = products.id;
+-- EXPLAIN ANALYZE SELECT
+--     reviews.id AS reviews_id, reviews.rating, reviews.summary, reviews.recommend, reviews.response, reviews.body, to_timestamp(reviews.date / 1000) AS date, reviews.reviewer_name, reviews.helpfulness, reviews.reported, reviews_characteristics.value AS characteristics_value, reviews_characteristics.characteristic_id AS characteristics_id, characteristics.name AS characteristics_name, products.name AS product_name, reviews_photos.url AS photo_url, reviews_photos.id AS photo_id
+--   FROM
+--     reviews
+--       LEFT JOIN reviews_photos
+--         ON reviews_photos.review_id = reviews.id,
+--     reviews_characteristics, characteristics, products
+--   WHERE reviews.product_id = 47421
+--   AND reviews_characteristics.review_id = reviews.id
+--   AND characteristics.id = reviews_characteristics.characteristic_id
+--   AND reviews.product_id = products.id;
 
-EXPLAIN ANALYZE SELECT
-    reviews.id AS reviews_id, reviews.rating, reviews.summary, reviews.recommend, reviews.response, reviews.body, to_timestamp(reviews.date / 1000) AS date, reviews.reviewer_name, reviews.helpfulness, reviews.reported, reviews_characteristics.value AS characteristics_value, reviews_characteristics.characteristic_id AS characteristics_id, characteristics.name AS characteristics_name, products.name AS product_name, reviews_photos.url AS photo_url, reviews_photos.id AS photo_id
-  FROM
-    reviews
-      LEFT JOIN reviews_photos
-        ON reviews_photos.review_id = reviews.id,
-    reviews_characteristics, characteristics, products
-  WHERE reviews.product_id = 1000000
-  AND reviews_characteristics.review_id = reviews.id
-  AND characteristics.id = reviews_characteristics.characteristic_id
-  AND reviews.product_id = products.id;
+-- EXPLAIN ANALYZE SELECT
+--     reviews.id AS reviews_id, reviews.rating, reviews.summary, reviews.recommend, reviews.response, reviews.body, to_timestamp(reviews.date / 1000) AS date, reviews.reviewer_name, reviews.helpfulness, reviews.reported, reviews_characteristics.value AS characteristics_value, reviews_characteristics.characteristic_id AS characteristics_id, characteristics.name AS characteristics_name, products.name AS product_name, reviews_photos.url AS photo_url, reviews_photos.id AS photo_id
+--   FROM
+--     reviews
+--       LEFT JOIN reviews_photos
+--         ON reviews_photos.review_id = reviews.id,
+--     reviews_characteristics, characteristics, products
+--   WHERE reviews.product_id = 1
+--   AND reviews_characteristics.review_id = reviews.id
+--   AND characteristics.id = reviews_characteristics.characteristic_id
+--   AND reviews.product_id = products.id;
 
-EXPLAIN ANALYZE UPDATE reviews
-  SET helpfulness = helpfulness + 1
-  WHERE id=1;
+-- EXPLAIN ANALYZE SELECT
+--     reviews.id AS reviews_id, reviews.rating, reviews.summary, reviews.recommend, reviews.response, reviews.body, to_timestamp(reviews.date / 1000) AS date, reviews.reviewer_name, reviews.helpfulness, reviews.reported, reviews_characteristics.value AS characteristics_value, reviews_characteristics.characteristic_id AS characteristics_id, characteristics.name AS characteristics_name, products.name AS product_name, reviews_photos.url AS photo_url, reviews_photos.id AS photo_id
+--   FROM
+--     reviews
+--       LEFT JOIN reviews_photos
+--         ON reviews_photos.review_id = reviews.id,
+--     reviews_characteristics, characteristics, products
+--   WHERE reviews.product_id = 1000000
+--   AND reviews_characteristics.review_id = reviews.id
+--   AND characteristics.id = reviews_characteristics.characteristic_id
+--   AND reviews.product_id = products.id;
 
-EXPLAIN ANALYZE UPDATE reviews
-  SET reported = TRUE
-  WHERE id=1;
+-- EXPLAIN ANALYZE UPDATE reviews
+--   SET helpfulness = helpfulness + 1
+--   WHERE id=1;
+
+-- EXPLAIN ANALYZE UPDATE reviews
+--   SET reported = TRUE
+--   WHERE id=1;

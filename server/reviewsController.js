@@ -53,6 +53,7 @@ const postNewReview = (req, res) => {
       res.sendStatus(201);
     })
     .catch((err) => {
+      console.log(err);
       console.log('REVIEW ID ALREADY EXISTS: ', err.detail);
       res.status(400).send('An unexpected error occurred: could not post this review');
     });

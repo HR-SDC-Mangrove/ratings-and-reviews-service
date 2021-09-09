@@ -119,7 +119,6 @@ describe('server routes', () => {
         characteristics: {
           158622: 1, 158623: 1, 158624: 1, 158625: 1,
         },
-        photos: ['test1.com', 'test2.com', 'test3.com', 'test4.com'],
       })
       .end((err, res) => {
         expect(res.text).to.include('An unexpected error occurred');

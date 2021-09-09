@@ -28,7 +28,8 @@ const markReviewHelpful = (req, res) => {
     .then(() => {
       res.sendStatus(204);
     })
-    .catch(() => {
+    .catch((err) => {
+      console.log(err);
       res.status(400).send('An unexpected error occurred: could not mark this review helpful');
     });
 };
@@ -53,6 +54,7 @@ const postNewReview = (req, res) => {
       res.sendStatus(201);
     })
     .catch(() => {
+      console.log(req.body.product_id);
       res.status(400).send('An unexpected error occurred: could not post this review');
     });
 };

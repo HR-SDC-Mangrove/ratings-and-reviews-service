@@ -28,8 +28,7 @@ const markReviewHelpful = (req, res) => {
     .then(() => {
       res.sendStatus(204);
     })
-    .catch((err) => {
-      console.log(err);
+    .catch(() => {
       res.status(400).send('An unexpected error occurred: could not mark this review helpful');
     });
 };
@@ -53,8 +52,8 @@ const postNewReview = (req, res) => {
     .then(() => {
       res.sendStatus(201);
     })
-    .catch(() => {
-      console.log(req.body.product_id);
+    .catch((err) => {
+      console.log('REVIEW ID ALREADY EXISTS: ', err.detail);
       res.status(400).send('An unexpected error occurred: could not post this review');
     });
 };

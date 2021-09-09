@@ -4,10 +4,10 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable import/no-unresolved */
 import { sleep, group } from 'k6';
-import TestGET from './loadTestGET.js';
-import TestPOST from './loadTestPOST.js';
-import TestREPORT from './loadTestREPORT.js';
-import TestHELPFUL from './loadTestHELPFUL.js';
+import TestGET from './k6Tests/loadTestGET.js';
+import TestPOST from './k6Tests/loadTestPOST.js';
+import TestREPORT from './k6Tests/loadTestREPORT.js';
+import TestHELPFUL from './k6Tests/loadTestHELPFUL.js';
 
 export const options = {
   scenarios: {

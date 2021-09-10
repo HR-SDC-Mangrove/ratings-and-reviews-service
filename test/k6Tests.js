@@ -15,8 +15,6 @@ const testGET = () => {
 
   const checkRes = check(res, {
     'status is 200 (there are reviews for this product id)': (r) => r.status === 200,
-    'status is 400 (there are no reviews for this product id)': (r) => r.status === 400,
-    'response body': (r) => r.body.length > 0 === true,
     'sends valid data even if db request fails': (r) => r.body.includes('productName'),
   });
 };
@@ -59,7 +57,6 @@ const testPOST = () => {
 
   const checkRes = check(res, {
     'status is 201 (review posted successfully)': (r) => r.status === 201,
-    'status is 400 (could not post, review id already exists)': (r) => r.status === 400,
   });
 };
 
@@ -72,7 +69,6 @@ const testREPORT = () => {
 
   const checkRes = check(res, {
     'status is 204 (review reported)': (r) => r.status === 204,
-    'status is 400 (could not report review)': (r) => r.status === 400,
   });
 };
 
@@ -85,7 +81,6 @@ const testHELPFUL = () => {
 
   const checkRes = check(res, {
     'status is 204 (review marked helpful)': (r) => r.status === 204,
-    'status is 400 (could not mark review helpful)': (r) => r.status === 400,
   });
 };
 

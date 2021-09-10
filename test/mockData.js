@@ -145,4 +145,61 @@ const sampleData = [
   },
 ];
 
-module.exports = sampleData;
+const evergreenData = {
+  product: '47421',
+  productName: '-----',
+  meta: {
+    product_id: '47421',
+    ratings: { 2: '2', 4: '2' },
+    recommended: { true: 3, false: 1 },
+    characteristics: {
+      Fit: { id: 158622, value: '3.625' },
+      Length: { id: 158623, value: '3.125' },
+      Comfort: { id: 158624, value: '2' },
+      Quality: { id: 158625, value: '2.5' },
+    },
+  },
+  results: [
+    {
+      review_id: 273025,
+      rating: 4,
+      summary: 'Nihil sit cupiditate laboriosam nihil ullam quas velit voluptatem.',
+      recommend: true,
+      response: null,
+      body: 'Consectetur quia aut et et sed. In sunt magni aut earum qui aut reprehenderit. Repellendus blanditiis quae incidunt harum. Ut inventore quas.',
+      date: '2021-02-08T10:21:17.000Z',
+      reviewer_name: 'Presley65',
+      helpfulness: 28,
+      photos: [],
+    },
+    {
+      review_id: 273026,
+      rating: 4,
+      summary: 'Culpa consequatur nam.',
+      recommend: true,
+      response: null,
+      body: 'Est aut vel a enim minima. Odio vel rem quam eum facilis iure fugit. Neque corrupti sint. Ex laudantium soluta quisquam odit ut eos atque voluptas. Quia velit odio voluptas saepe qui. Qui placeat molestias praesentium.',
+      date: '2021-01-10T14:05:01.000Z',
+      reviewer_name: 'Shakira.Marks7',
+      helpfulness: 21,
+      photos: [],
+    },
+    {
+      review_id: 273027,
+      rating: 2,
+      summary: 'Voluptatem molestiae consequatur dolores sit.',
+      recommend: true,
+      response: null,
+      body: 'Sint a quia illo iusto quo fugit ullam quos accusantium. Mollitia et fugiat adipisci tempora aliquam debitis sequi possimus. Voluptates laudantium porro atque dolorem. Debitis est quia natus et sunt iure voluptate recusandae.',
+      date: '2021-02-21T05:35:41.000Z',
+      reviewer_name: 'Brando.Dietrich21',
+      helpfulness: 9,
+      photos: [],
+    },
+  ],
+};
+
+module.exports = {
+  sampleData,
+  evergreenData,
+};

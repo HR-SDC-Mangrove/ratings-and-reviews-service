@@ -1,6 +1,15 @@
 DROP SCHEMA IF EXISTS reviews CASCADE;
 
 CREATE SCHEMA reviews
+  CREATE TABLE products(
+    id SERIAL PRIMARY KEY,
+    name TEXT,
+    slogan TEXT,
+    description TEXT,
+    category TEXT,
+    default_price INTEGER
+  )
+
   CREATE TABLE reviews(
     id SERIAL PRIMARY KEY,
     product_id INTEGER,
@@ -16,24 +25,11 @@ CREATE SCHEMA reviews
     helpfulness INTEGER
   )
 
-  CREATE INDEX ON reviews(product_id)
-
   CREATE TABLE reviews_photos(
     id SERIAL PRIMARY KEY,
     review_id INTEGER,
     url TEXT
   )
-
-  CREATE INDEX ON reviews_photos(review_id)
-
-  CREATE TABLE reviews_characteristics(
-    id SERIAL PRIMARY KEY,
-    characteristic_id INTEGER,
-    review_id INTEGER,
-    value INTEGER
-  )
-
-  CREATE INDEX ON reviews_characteristics(review_id)
 
   CREATE TABLE characteristics(
     id SERIAL PRIMARY KEY,
@@ -41,30 +37,51 @@ CREATE SCHEMA reviews
     name TEXT
   )
 
-  CREATE INDEX ON characteristics(id)
-
-  CREATE TABLE products(
+  CREATE TABLE reviews_characteristics(
     id SERIAL PRIMARY KEY,
-    name TEXT,
-    slogan TEXT,
-    description TEXT,
-    category TEXT,
-    default_price INTEGER
-  )
-
-  CREATE INDEX ON products(id);
+    characteristic_id INTEGER,
+    review_id INTEGER,
+    value INTEGER
+  );
 
 SET search_path TO reviews;
 
-\copy reviews(id, product_id, rating, date, summary, body, recommend, reported, reviewer_name, reviewer_email, response, helpfulness) from '/Users/sunikkim/Desktop/coding/HR-IMMERSIVE/SDC-DATA/reviews.csv' delimiter ',' csv header;
+\copy products(id, name, slogan, description, category, default_price) from '/Users/sunikkim/Desktop/coding/HR-IMMERSIVE/SDC-DATA/product.csv' delimiter ',' csv header
 
-\copy products(id, name, slogan, description, category, default_price) from '/Users/sunikkim/Desktop/coding/HR-IMMERSIVE/SDC-DATA/product.csv' delimiter ',' csv header;
+\copy reviews(id, product_id, rating, date, summary, body, recommend, reported, reviewer_name, reviewer_email, response, helpfulness) from '/Users/sunikkim/Desktop/coding/HR-IMMERSIVE/SDC-DATA/reviews.csv' delimiter ',' csv header
 
-\copy characteristics(id, product_id, name) from '/Users/sunikkim/Desktop/coding/HR-IMMERSIVE/SDC-DATA/characteristics.csv' delimiter ',' csv header;
+\copy reviews_photos(id, review_id, url) from '/Users/sunikkim/Desktop/coding/HR-IMMERSIVE/SDC-DATA/reviews_photos.csv' delimiter ',' csv header
+
+\copy characteristics(id, product_id, name) from '/Users/sunikkim/Desktop/coding/HR-IMMERSIVE/SDC-DATA/characteristics.csv' delimiter ',' csv header
 
 \copy reviews_characteristics(id, characteristic_id, review_id, value) from '/Users/sunikkim/Desktop/coding/HR-IMMERSIVE/SDC-DATA/characteristic_reviews.csv' delimiter ',' csv header;
 
-\copy reviews_photos(id, review_id, url) from '/Users/sunikkim/Desktop/coding/HR-IMMERSIVE/SDC-DATA/reviews_photos.csv' delimiter ',' csv header;
+CREATE INDEX ON products(id);
+CREATE INDEX ON reviews(product_id);
+CREATE INDEX ON reviews_photos(review_id);
+CREATE INDEX ON characteristics(id);
+CREATE INDEX ON reviews_characteristics(review_id);
+
+ALTER TABLE reviews
+  ADD CONSTRAINT fk_reviews FOREIGN KEY (product_id) REFERENCES products(id);
+
+ALTER TABLE reviews_photos
+  ADD CONSTRAINT fk_reviews_photos FOREIGN KEY (review_id) REFERENCES reviews(id);
+
+ALTER TABLE characteristics
+  ADD CONSTRAINT fk_characteristics FOREIGN KEY (product_id) REFERENCES products(id);
+
+ALTER TABLE reviews_characteristics
+  ADD CONSTRAINT fk_reviews_characteristics_c FOREIGN KEY (characteristic_id) REFERENCES characteristics(id);
+
+ALTER TABLE reviews_characteristics
+  ADD CONSTRAINT fk_reviews_characteristics_r FOREIGN KEY (review_id) REFERENCES reviews(id);
+
+SELECT setval('reviews_id_seq', (SELECT MAX(id) FROM reviews));
+SELECT setval('reviews_photos_id_seq', (SELECT MAX(id) FROM reviews_photos));
+SELECT setval('reviews_characteristics_id_seq', (SELECT MAX(id) FROM reviews_characteristics));
+SELECT setval('characteristics_id_seq', (SELECT MAX(id) FROM characteristics));
+SELECT setval('products_id_seq', (SELECT MAX(id) FROM products));
 
 EXPLAIN ANALYZE SELECT * FROM reviews WHERE product_id=1;
 EXPLAIN ANALYZE SELECT * FROM reviews WHERE product_id=10000;
@@ -129,16 +146,3 @@ EXPLAIN ANALYZE UPDATE reviews
 EXPLAIN ANALYZE UPDATE reviews
   SET reported = TRUE
   WHERE id=1;
-
--- EXPLAIN ANALYZE WITH ins1 AS (
---     INSERT INTO reviews(id, product_id, rating, date, summary, body, recommend, reported, reviewer_name, reviewer_email, response, helpfulness)
---     VALUES((SELECT max(id) FROM reviews) + 1, 1, 5, ROUND(EXTRACT(EPOCH FROM NOW())::float*1000), 'summary', 'body', TRUE, FALSE, 'name', 'email', '', 0)
---     RETURNING id
---     )
---   ,ins2 AS (
---     INSERT INTO reviews_photos(id, review_id, url)
---     VALUES (1,1,'test1.com'), (2,1,'test2.com'), (3,1,'test3.com'), (4,1,'test4.com')
---     )
---   INSERT INTO reviews_characteristics(id, characteristic_id, review_id, value)
---   VALUES (1,1,1,1), (2,2,1,1), (3,3,1,1), (4,4,1,1)
---   RETURNING (SELECT id AS review_id FROM ins1);

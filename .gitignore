@@ -4,3 +4,4 @@ postgresETL.js
 local_schemas
 .env
 .nyc_output
+.nyc_output/index.json

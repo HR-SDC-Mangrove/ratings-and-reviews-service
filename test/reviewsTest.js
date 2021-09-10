@@ -11,16 +11,16 @@ const app = require('../server/server');
 
 const port = 8000;
 
-const sampleData = require('./mockData');
+const { sampleData } = require('./mockData');
 
 const db = require('../database/index');
 const dbHelpers = require('../database/dbHelpers');
 const reviewsHelpers = require('../server/reviewsHelpers');
 
 describe('server routes', () => {
-  it('get route returns product info', (done) => {
+  it('get route returns product info sorted by relevance', (done) => {
     chai.request(app)
-      .get('/reviews/product/47421')
+      .get('/reviews/product/47421?sort=relevance')
       .end((err, res) => {
         expect(res.text).to.include('Rhett Jacket');
         expect(res.text).to.include('47421');
@@ -28,7 +28,26 @@ describe('server routes', () => {
       });
   });
 
-  it('mark review helpful route', (done) => {
+  it('get route returns product info sorted by newest', (done) => {
+    chai.request(app)
+      .get('/reviews/product/47421?sort=newest&count=50')
+      .end((err, res) => {
+        expect(res.text).to.include('Rhett Jacket');
+        expect(res.text).to.include('47421');
+        done();
+      });
+  });
+
+  it('get route returns valid evergreen data for invalid product id', (done) => {
+    chai.request(app)
+      .get('/reviews/product/474211401401924081901024?sort=newest')
+      .end((err, res) => {
+        expect(res.text).to.include('productName');
+        done();
+      });
+  });
+
+  it('mark review helpful route works for valid review id', (done) => {
     chai.request(app)
       .put('/reviews/50000/helpful')
       .end((err, res) => {
@@ -37,7 +56,16 @@ describe('server routes', () => {
       });
   });
 
-  it('report review route', (done) => {
+  it('mark review helpful route returns relevant error message for invalid review id', (done) => {
+    chai.request(app)
+      .put('/reviews/500000000000000/helpful')
+      .end((err, res) => {
+        expect(res.text).to.include('An unexpected error occurred');
+        done();
+      });
+  });
+
+  it('report review route works for valid review id', (done) => {
     chai.request(app)
       .put('/reviews/50000/report')
       .end((err, res) => {
@@ -46,7 +74,16 @@ describe('server routes', () => {
       });
   });
 
-  it('post review route', (done) => {
+  it('report review route returns relevant error message for invalid review id', (done) => {
+    chai.request(app)
+      .put('/reviews/500000000000000000/report')
+      .end((err, res) => {
+        expect(res.text).to.include('An unexpected error occurred');
+        done();
+      });
+  });
+
+  it('post review route works for valid product id', (done) => {
     chai.request(app)
       .post('/reviews/')
       .send({
@@ -67,6 +104,27 @@ describe('server routes', () => {
         done();
       });
   });
+
+  it('post review route returns relevant error message for invalid product id', (done) => {
+    chai.request(app)
+      .post('/reviews/')
+      .send({
+        product_id: 500000000000000,
+        rating: 5,
+        summary: 'MOCHACHAITEST',
+        body: 'MOCHACHAITESTING',
+        recommend: true,
+        name: 'test',
+        email: 'test@test.com',
+        characteristics: {
+          158622: 1, 158623: 1, 158624: 1, 158625: 1,
+        },
+      })
+      .end((err, res) => {
+        expect(res.text).to.include('An unexpected error occurred');
+        done();
+      });
+  });
 });
 
 describe('GET /reviews', () => {
@@ -81,31 +139,31 @@ describe('GET /reviews', () => {
   });
 
   it('returns correct reviews in correct format for valid product id 47421', async () => {
-    const response = await request.get('/product/47421');
+    const response = await request.get('/product/47421?sort=relevance');
     expect(response.body.product).to.eql('47421');
     expect(response.body.results.length).to.not.eql(0);
   });
 
   it('returns correct reviews in correct format for valid product id 47425', async () => {
-    const response = await request.get('/product/47425');
+    const response = await request.get('/product/47425?sort=helpfulness');
     expect(response.body.product).to.eql('47425');
     expect(response.body.results.length).to.not.eql(0);
   });
 
   it('returns correct reviews in correct format for valid product id 50001', async () => {
-    const response = await request.get('/product/50001');
+    const response = await request.get('/product/50001?sort=newest');
     expect(response.body.product).to.eql('50001');
     expect(response.body.results.length).to.not.eql(0);
   });
 
   it('returns correct reviews in correct format for valid product id 1', async () => {
-    const response = await request.get('/product/1');
+    const response = await request.get('/product/1?sort=relevance');
     expect(response.body.product).to.eql('1');
     expect(response.body.results.length).to.not.eql(0);
   });
 
   it('returns correct reviews in correct format for valid product id 100000', async () => {
-    const response = await request.get('/product/100000');
+    const response = await request.get('/product/100000?sort=helpfulness');
     expect(response.body.product).to.eql('100000');
     expect(response.body.results.length).to.not.eql(0);
   });

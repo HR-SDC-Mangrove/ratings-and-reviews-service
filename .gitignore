@@ -6,3 +6,4 @@ local_schemas
 .nyc_output
 .nyc_output/index.json
 newrelic.js
+newrelic_agent.log

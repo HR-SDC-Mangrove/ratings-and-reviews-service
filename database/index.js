@@ -23,7 +23,7 @@ const getReviews = (productId) => {
   AND reviews.product_id = products.id
   ;`;
 
-  return db.query(query, productId);
+  return db.any(query, productId);
 };
 
 const markReviewHelpful = (reviewId) => {

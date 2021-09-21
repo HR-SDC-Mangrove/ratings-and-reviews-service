@@ -14,8 +14,16 @@ const helpers = require('./dbHelpers');
 const cn = `postgres://${process.env.DB_USER}:${process.env.DB_PASSWORD}@${process.env.DB_HOST}:${process.env.DB_PORT}/${process.env.DB_DATABASE}`;
 const db = pgp(cn);
 
+db.connect()
+  .then((obj) => {
+    console.log('DB CONNECTED', obj.client.serverVersion);
+  })
+  .catch((err) => {
+    console.log('DB ERROR: ', err);
+  });
+
 const getReviews = (productId) => {
-  console.log('ENTERED GET REVIEWS DB');
+  console.log('ENTERED GET REVIEWS DB', db);
 
   const query = `
   SELECT DISTINCT

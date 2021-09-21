@@ -1,8 +1,8 @@
 const initOptions = {
   error(error, e) {
     if (e.cn) {
-      console.log('CN: ', e.cn);
-      console.log('EVENT: ', error.message || error);
+      console.log('PG CN ERROR: ', e.cn);
+      console.log('PG EVENT ERROR: ', error.message || error);
     }
   },
   schema: process.env.DB_SCHEMA,
@@ -15,6 +15,8 @@ const cn = `postgres://${process.env.DB_USER}:${process.env.DB_PASSWORD}@${proce
 const db = pgp(cn);
 
 const getReviews = (productId) => {
+  console.log('ENTERED GET REVIEWS DB');
+
   const query = `
   SELECT DISTINCT
     reviews.id AS reviews_id, reviews.rating, reviews.summary, reviews.recommend, reviews.response, reviews.body, to_timestamp(reviews.date / 1000) AS date, reviews.reviewer_name, reviews.helpfulness, reviews.reported, reviews_characteristics.value AS characteristics_value, reviews_characteristics.characteristic_id AS characteristics_id, characteristics.name AS characteristics_name, products.name AS product_name, reviews_photos.url AS photo_url, reviews_photos.id AS photo_id

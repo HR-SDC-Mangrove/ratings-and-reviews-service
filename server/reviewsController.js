@@ -11,9 +11,9 @@ const getReviews = async (req, res) => {
   const sortMethod = req.query.sort;
   const count = Number(req.query.count);
 
-  const result = await db.getReviews(productId);
+  console.log('ENTERED GET REVIEWS!');
 
-  console.log('ENTERED GET REVIEWS! result: ', result);
+  const result = await db.getReviews(productId);
 
   if (result.length) {
     console.log('SUCCESS!!!');

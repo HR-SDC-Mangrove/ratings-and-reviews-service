@@ -1,4 +1,10 @@
 const initOptions = {
+  error(error, e) {
+    if (e.cn) {
+      console.log('CN: ', e.cn);
+      console.log('EVENT: ', error.message || error);
+    }
+  },
   schema: process.env.DB_SCHEMA,
 };
 const pgp = require('pg-promise')(initOptions);

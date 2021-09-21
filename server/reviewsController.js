@@ -11,16 +11,12 @@ const getReviews = async (req, res) => {
   const sortMethod = req.query.sort;
   const count = Number(req.query.count);
 
-  console.log('ENTERED GET REVIEWS!');
-
   const result = await db.getReviews(productId);
 
   if (result.length) {
-    console.log('SUCCESS!!!');
     const output = helpers.formatReviews(result, productId, sortMethod, count);
     res.send(output);
   } else {
-    console.log('FAILURE - SENDING EVERGREEN DATA');
     res.send(evergreenData);
   }
 };

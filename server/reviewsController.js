@@ -6,19 +6,23 @@ const db = require('../database/index');
 const helpers = require('./reviewsHelpers');
 const { evergreenData } = require('../test/mockData');
 
-const getReviews = (req, res) => {
+const getReviews = async (req, res) => {
   const { productId } = req.params;
   const sortMethod = req.query.sort;
   const count = Number(req.query.count);
 
-  db.getReviews(productId)
-    .then((result) => {
-      const output = helpers.formatReviews(result, productId, sortMethod, count);
-      res.send(output);
-    })
-    .catch(() => {
-      res.status(400).send(evergreenData);
-    });
+  const result = await db.getReviews(productId);
+
+  console.log('ENTERED GET REVIEWS! result: ', result);
+
+  if (result.length) {
+    console.log('SUCCESS!!!');
+    const output = helpers.formatReviews(result, productId, sortMethod, count);
+    res.send(output);
+  } else {
+    console.log('FAILURE - SENDING EVERGREEN DATA');
+    res.send(evergreenData);
+  }
 };
 
 const markReviewHelpful = (req, res) => {

@@ -15,15 +15,13 @@ const reviewsRouter = require('./reviewsRoutes');
 app.use('/reviews', reviewsRouter);
 
 const loaderIO = (req, res) => {
-  console.log('entered loader');
-
   res.sendFile(process.env.LOADER);
 };
 
-app.get('/loaderio-d37ce2bdeb6d2d663531cf1c51a39bd9.txt', loaderIO);
+app.get(`/${process.env.LOADER_FILE}.txt`, loaderIO);
 
-app.get('/loaderio-d37ce2bdeb6d2d663531cf1c51a39bd9.html', loaderIO);
+app.get(`/${process.env.LOADER_FILE}.html`, loaderIO);
 
-app.get('/loaderio-d37ce2bdeb6d2d663531cf1c51a39bd9/', loaderIO);
+app.get(`/${process.env.LOADER_FILE}/`, loaderIO);
 
 module.exports = app;

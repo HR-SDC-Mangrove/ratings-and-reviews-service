@@ -15,8 +15,6 @@ const reviewsRouter = require('./reviewsRoutes');
 app.use('/reviews', reviewsRouter);
 
 const loaderIO = (req, res) => {
-  console.log('entered loader');
-
   res.sendFile(process.env.LOADER);
 };
 

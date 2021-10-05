@@ -20,24 +20,36 @@ const getReviews = (req, res) => {
   const sortMethod = req.query.sort;
   const count = Number(req.query.count);
 
-  client.get(productId, (err, reply) => {
-    if (reply) {
-      const result = JSON.parse(reply);
-      res.send(result);
-    } else {
-      db.getReviews(productId)
-        .then((data) => {
-          if (data.length) {
-            const output = helpers.formatReviews(data, productId, sortMethod, count);
-            client.set(productId, JSON.stringify(output));
-            res.send(output);
-          } else {
-            client.set(productId, JSON.stringify(evergreenData));
-            res.send(evergreenData);
-          }
-        });
-    }
-  });
+  if (process.env.REDIS) {
+    client.get(productId, (err, reply) => {
+      if (reply) {
+        const result = JSON.parse(reply);
+        res.send(result);
+      } else {
+        db.getReviews(productId)
+          .then((data) => {
+            if (data.length) {
+              const output = helpers.formatReviews(data, productId, sortMethod, count);
+              client.set(productId, JSON.stringify(output));
+              res.send(output);
+            } else {
+              client.set(productId, JSON.stringify(evergreenData));
+              res.send(evergreenData);
+            }
+          });
+      }
+    });
+  } else {
+    db.getReviews(productId)
+      .then((data) => {
+        if (data.length) {
+          const output = helpers.formatReviews(data, productId, sortMethod, count);
+          res.send(output);
+        } else {
+          res.send(evergreenData);
+        }
+      });
+  }
 };
 
 const markReviewHelpful = (req, res) => {

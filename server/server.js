@@ -24,4 +24,10 @@ app.get(`/${process.env.LOADER_FILE}.html`, loaderIO);
 
 app.get(`/${process.env.LOADER_FILE}/`, loaderIO);
 
+const loaderPayload = (req, res) => {
+  res.sendFile(process.env.LOADER_PAYLOAD);
+};
+
+app.get('/loaderPayload.json', loaderPayload);
+
 module.exports = app;

@@ -22,13 +22,11 @@ const getReviews = (req, res) => {
 
   client.get(productId, (err, reply) => {
     if (reply) {
-      console.log('returning cached');
       const result = JSON.parse(reply);
       res.send(result);
     } else {
       db.getReviews(productId)
         .then((data) => {
-          console.log('NOT returning cached');
           if (data.length) {
             const output = helpers.formatReviews(data, productId, sortMethod, count);
             client.set(productId, JSON.stringify(output));

@@ -2,23 +2,44 @@
 /* eslint-disable guard-for-in */
 /* eslint-disable no-shadow */
 /* eslint-disable no-plusplus */
+const redis = require('redis');
 const db = require('../database/index');
 const helpers = require('./reviewsHelpers');
 const { evergreenData } = require('../test/mockData');
 
-const getReviews = async (req, res) => {
+const client = redis.createClient();
+client.on('connect', () => {
+  console.log('redis connected');
+});
+client.on('error', (err) => {
+  console.log('redis error: ', err);
+});
+
+const getReviews = (req, res) => {
   const { productId } = req.params;
   const sortMethod = req.query.sort;
   const count = Number(req.query.count);
 
-  const result = await db.getReviews(productId);
-
-  if (result.length) {
-    const output = helpers.formatReviews(result, productId, sortMethod, count);
-    res.send(output);
-  } else {
-    res.send(evergreenData);
-  }
+  client.get(productId, (err, reply) => {
+    if (reply) {
+      console.log('returning cached');
+      const result = JSON.parse(reply);
+      res.send(result);
+    } else {
+      db.getReviews(productId)
+        .then((data) => {
+          console.log('NOT returning cached');
+          if (data.length) {
+            const output = helpers.formatReviews(data, productId, sortMethod, count);
+            client.set(productId, JSON.stringify(output));
+            res.send(output);
+          } else {
+            client.set(productId, JSON.stringify(evergreenData));
+            res.send(evergreenData);
+          }
+        });
+    }
+  });
 };
 
 const markReviewHelpful = (req, res) => {

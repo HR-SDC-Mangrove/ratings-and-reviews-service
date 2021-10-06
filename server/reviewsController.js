@@ -91,12 +91,11 @@ const postNewReview = (req, res) => {
     });
 };
 
+// BELOW ROUTES ARE FOR TESTING ONLY
 const getReviewsTEST = (req, res) => {
   const productId = Math.floor(Math.random() * 1000000) + 1;
   const sortMethod = req.query.sort;
   const count = Number(req.query.count);
-
-  console.log('getReviews productId', productId);
 
   if (process.env.REDIS) {
     client.get(productId, (err, reply) => {
@@ -132,8 +131,6 @@ const getReviewsTEST = (req, res) => {
 
 const markReviewHelpfulTEST = (req, res) => {
   const reviewId = Math.floor(Math.random() * 500000) + 1;
-
-  console.log('markReviewHelpful reviewId', reviewId);
 
   db.markReviewHelpful(reviewId)
     .then(() => {

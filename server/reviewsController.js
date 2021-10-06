@@ -96,8 +96,6 @@ const getReviewsTEST = (req, res) => {
   const sortMethod = req.query.sort;
   const count = Number(req.query.count);
 
-  console.log('getReviews productId', productId);
-
   if (process.env.REDIS) {
     client.get(productId, (err, reply) => {
       if (reply) {
@@ -132,8 +130,6 @@ const getReviewsTEST = (req, res) => {
 
 const markReviewHelpfulTEST = (req, res) => {
   const reviewId = Math.floor(Math.random() * 500000) + 1;
-
-  console.log('markReviewHelpful reviewId', reviewId);
 
   db.markReviewHelpful(reviewId)
     .then(() => {

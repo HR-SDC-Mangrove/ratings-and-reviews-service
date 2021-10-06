@@ -26,8 +26,6 @@ const sendFile = (fileName) => {
 const stressTest = (req, res) => {
   const productId = Math.floor(Math.random() * 1000000) + 1;
 
-  console.log('random productId: ', productId);
-
   res.redirect(`/reviews/product/${productId}`);
 };
 

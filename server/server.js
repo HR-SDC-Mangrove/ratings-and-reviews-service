@@ -30,9 +30,9 @@ const stressTest = (req, res) => {
 };
 
 const stressTestPUT = (req, res) => {
-  const productId = Math.floor(Math.random() * 1000000) + 1;
+  const reviewId = Math.floor(Math.random() * 500000) + 1;
 
-  res.redirect(`/reviews/product/${productId}/helpful`);
+  res.redirect(`/reviews/${reviewId}/helpful`);
 };
 
 app.get(`/${process.env.LOADER_FILE}.txt`, sendFile(process.env.LOADER));

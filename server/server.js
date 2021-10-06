@@ -14,20 +14,34 @@ const reviewsRouter = require('./reviewsRoutes');
 
 app.use('/reviews', reviewsRouter);
 
-const loaderIO = (req, res) => {
-  res.sendFile(process.env.LOADER);
+// BELOW ROUTES ARE FOR TESTING ONLY
+const sendFile = (fileName) => {
+  const output = (req, res) => {
+    res.sendFile(fileName);
+  };
+
+  return output;
 };
 
-app.get(`/${process.env.LOADER_FILE}.txt`, loaderIO);
+const stressTest = (req, res) => {
+  const productId = Math.floor(Math.random() * 1000000) + 1;
 
-app.get(`/${process.env.LOADER_FILE}.html`, loaderIO);
+  console.log('random productId: ', productId);
 
-app.get(`/${process.env.LOADER_FILE}/`, loaderIO);
-
-const loaderPayload = (req, res) => {
-  res.sendFile(process.env.LOADER_PAYLOAD);
+  res.redirect(`/reviews/product/${productId}`);
 };
 
-app.get('/loaderPayload.json', loaderPayload);
+const stressTestPUT = (req, res) => {
+  const productId = Math.floor(Math.random() * 1000000) + 1;
+
+  res.redirect(`/reviews/product/${productId}/helpful`);
+};
+
+app.get(`/${process.env.LOADER_FILE}.txt`, sendFile(process.env.LOADER));
+app.get(`/${process.env.LOADER_FILE}.html`, sendFile(process.env.LOADER));
+app.get(`/${process.env.LOADER_FILE}/`, sendFile(process.env.LOADER));
+app.get('/loaderPayload.json', sendFile(process.env.LOADER_PAYLOAD));
+app.get('/stressTest', stressTest);
+app.put('/stressTestPUT', stressTestPUT);
 
 module.exports = app;

@@ -91,6 +91,7 @@ const postNewReview = (req, res) => {
     });
 };
 
+// BELOW ROUTES ARE FOR TESTING ONLY
 const getReviewsTEST = (req, res) => {
   const productId = Math.floor(Math.random() * 1000000) + 1;
   const sortMethod = req.query.sort;

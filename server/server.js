@@ -11,6 +11,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
 const reviewsRouter = require('./reviewsRoutes');
+const reviewsController = require('./reviewsController');
 
 app.use('/reviews', reviewsRouter);
 
@@ -23,23 +24,23 @@ const sendFile = (fileName) => {
   return output;
 };
 
-const stressTest = (req, res) => {
-  const productId = Math.floor(Math.random() * 1000000) + 1;
+// const stressTest = (req, res) => {
+//   const productId = Math.floor(Math.random() * 1000000) + 1;
 
-  res.redirect(`/reviews/product/${productId}`);
-};
+//   res.redirect(`/reviews/product/${productId}`);
+// };
 
-const stressTestPUT = (req, res) => {
-  const reviewId = Math.floor(Math.random() * 500000) + 1;
+// const stressTestPUT = (req, res) => {
+//   const reviewId = Math.floor(Math.random() * 500000) + 1;
 
-  res.redirect(`/reviews/${reviewId}/helpful`);
-};
+//   res.redirect(`/reviews/${reviewId}/helpful`);
+// };
 
 app.get(`/${process.env.LOADER_FILE}.txt`, sendFile(process.env.LOADER));
 app.get(`/${process.env.LOADER_FILE}.html`, sendFile(process.env.LOADER));
 app.get(`/${process.env.LOADER_FILE}/`, sendFile(process.env.LOADER));
 app.get('/loaderPayload.json', sendFile(process.env.LOADER_PAYLOAD));
-app.get('/stressTest', stressTest);
-app.put('/stressTestPUT', stressTestPUT);
+app.get('/stressTest', reviewsController.getReviewsTEST);
+app.put('/stressTestPUT', reviewsController.markReviewHelpfulTEST);
 
 module.exports = app;

@@ -24,6 +24,7 @@ const getReviews = (req, res) => {
   console.log('entered get reviews', productId);
 
   if (process.env.REDIS) {
+    console.log('entered redis');
     client.get(productId, (err, reply) => {
       if (reply) {
         const result = JSON.parse(reply);
@@ -31,6 +32,7 @@ const getReviews = (req, res) => {
       } else {
         db.getReviews(productId)
           .then((data) => {
+            console.log('dataONE', data);
             if (data.length) {
               const output = helpers.formatReviews(data, productId, sortMethod, count);
               client.set(productId, JSON.stringify(output));
@@ -45,6 +47,7 @@ const getReviews = (req, res) => {
   } else {
     db.getReviews(productId)
       .then((data) => {
+        console.log('dataTWO', data);
         if (data.length) {
           const output = helpers.formatReviews(data, productId, sortMethod, count);
           res.send(output);

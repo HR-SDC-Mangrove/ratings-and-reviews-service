@@ -21,7 +21,7 @@ const getReviews = (req, res) => {
   const sortMethod = req.query.sort;
   const count = Number(req.query.count);
 
-  console.log('getReviews');
+  console.log('getReviews', productId);
 
   if (process.env.REDIS === true) {
     client.get(productId, (err, reply) => {

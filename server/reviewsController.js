@@ -23,6 +23,8 @@ const getReviews = (req, res) => {
 
   console.log('entered get reviews', productId);
 
+  console.log('redis conditional', process.env.REDIS === true);
+
   if (process.env.REDIS) {
     console.log('entered redis');
     client.get(productId, (err, reply) => {

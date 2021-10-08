@@ -21,12 +21,7 @@ const getReviews = (req, res) => {
   const sortMethod = req.query.sort;
   const count = Number(req.query.count);
 
-  console.log('entered get reviews', productId);
-
-  console.log('redis conditional', process.env.REDIS === true, process.env.REDIS);
-
   if (process.env.REDIS === true) {
-    console.log('entered redis');
     client.get(productId, (err, reply) => {
       if (reply) {
         const result = JSON.parse(reply);
@@ -34,7 +29,6 @@ const getReviews = (req, res) => {
       } else {
         db.getReviews(productId)
           .then((data) => {
-            console.log('dataONE', data);
             if (data.length) {
               const output = helpers.formatReviews(data, productId, sortMethod, count);
               client.set(productId, JSON.stringify(output));
@@ -49,7 +43,6 @@ const getReviews = (req, res) => {
   } else {
     db.getReviews(productId)
       .then((data) => {
-        console.log('dataTWO', data);
         if (data.length) {
           const output = helpers.formatReviews(data, productId, sortMethod, count);
           res.send(output);
@@ -63,8 +56,6 @@ const getReviews = (req, res) => {
 const markReviewHelpful = (req, res) => {
   const { reviewId } = req.params;
 
-  console.log('markReviewHelpful reviewId', reviewId);
-
   db.markReviewHelpful(reviewId)
     .then(() => {
       res.sendStatus(204);
@@ -76,8 +67,6 @@ const markReviewHelpful = (req, res) => {
 
 const reportReview = (req, res) => {
   const { reviewId } = req.params;
-
-  console.log('entered report review', reviewId);
 
   db.reportReview(reviewId)
     .then(() => {
@@ -91,7 +80,7 @@ const reportReview = (req, res) => {
 const postNewReview = (req, res) => {
   const data = req.body;
 
-  console.log('entered post review', data);
+  console.log('post review data', data);
 
   db.postNewReview(data)
     .then(() => {

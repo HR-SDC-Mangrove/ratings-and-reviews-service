@@ -21,8 +21,6 @@ const getReviews = (req, res) => {
   const sortMethod = req.query.sort;
   const count = Number(req.query.count);
 
-  console.log('getReviews', productId);
-
   if (process.env.REDIS === true) {
     client.get(productId, (err, reply) => {
       if (reply) {
@@ -82,8 +80,6 @@ const reportReview = (req, res) => {
 const postNewReview = (req, res) => {
   const data = req.body;
 
-  console.log('post review data', data);
-
   db.postNewReview(data)
     .then(() => {
       res.sendStatus(201);
@@ -99,7 +95,7 @@ const getReviewsTEST = (req, res) => {
   const sortMethod = req.query.sort;
   const count = Number(req.query.count);
 
-  if (process.env.REDIS) {
+  if (process.env.REDIS === true) {
     client.get(productId, (err, reply) => {
       if (reply) {
         const result = JSON.parse(reply);

@@ -1,7 +1,7 @@
 # Ratings & Reviews Microservice
 
 ## Overview
-A scalable back end built to support increasing traffic for an e-commerce website.
+A scalable back end built to support increasing traffic for an e-commerce website. Built with JavaScript, Node, Express, AWS (EC2), PostgreSQL, Redis, Loader.io, k6, Nginx and New Relic.
 
 ## Technical Challenges and Improvements Made
 This microservice was built from the ground up after an extensive planning phase that involved:

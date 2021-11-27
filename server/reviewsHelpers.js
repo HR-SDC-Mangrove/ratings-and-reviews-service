@@ -1,6 +1,7 @@
 /* eslint-disable no-restricted-syntax */
 /* eslint-disable guard-for-in */
 /* eslint-disable no-plusplus */
+
 const extractPhotos = (reviews) => {
   const photos = [];
   const tracker = [];

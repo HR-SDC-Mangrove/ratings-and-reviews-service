@@ -95,6 +95,4 @@ module.exports = {
   markReviewHelpful,
   reportReview,
   postNewReview,
-  getReviewsTEST,
-  markReviewHelpfulTEST,
 };

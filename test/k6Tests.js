@@ -3,6 +3,7 @@
 /* eslint-disable func-names */
 /* eslint-disable no-unused-vars */
 /* eslint-disable import/no-unresolved */
+
 import http from 'k6/http';
 import { sleep, group, check } from 'k6';
 

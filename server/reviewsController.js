@@ -3,6 +3,7 @@
 /* eslint-disable guard-for-in */
 /* eslint-disable no-shadow */
 /* eslint-disable no-plusplus */
+
 const redis = require('redis');
 const db = require('../database/index');
 const helpers = require('./reviewsHelpers');
@@ -86,56 +87,6 @@ const postNewReview = (req, res) => {
     })
     .catch(() => {
       res.status(400).send('An unexpected error occurred: could not post this review');
-    });
-};
-
-// BELOW ROUTES ARE FOR TESTING ONLY
-const getReviewsTEST = (req, res) => {
-  const productId = Math.floor(Math.random() * 1000000) + 1;
-  const sortMethod = req.query.sort;
-  const count = Number(req.query.count);
-
-  if (process.env.REDIS === true) {
-    client.get(productId, (err, reply) => {
-      if (reply) {
-        const result = JSON.parse(reply);
-        res.send(result);
-      } else {
-        db.getReviews(productId)
-          .then((data) => {
-            if (data.length) {
-              const output = helpers.formatReviews(data, productId, sortMethod, count);
-              client.set(productId, JSON.stringify(output));
-              res.send(output);
-            } else {
-              client.set(productId, JSON.stringify(evergreenData));
-              res.send(evergreenData);
-            }
-          });
-      }
-    });
-  } else {
-    db.getReviews(productId)
-      .then((data) => {
-        if (data.length) {
-          const output = helpers.formatReviews(data, productId, sortMethod, count);
-          res.send(output);
-        } else {
-          res.send(evergreenData);
-        }
-      });
-  }
-};
-
-const markReviewHelpfulTEST = (req, res) => {
-  const reviewId = Math.floor(Math.random() * 500000) + 1;
-
-  db.markReviewHelpful(reviewId)
-    .then(() => {
-      res.sendStatus(204);
-    })
-    .catch(() => {
-      res.status(400).send('An unexpected error occurred: could not mark this review helpful');
     });
 };
 

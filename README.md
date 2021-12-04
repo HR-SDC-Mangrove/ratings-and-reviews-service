@@ -15,5 +15,5 @@ The end result was a microservice capable of handling > 1000RPS with a 0% error 
 
 **Technical Accomplishments:**
 - Designed ETL system with SQL script that seeded over 1 million csv records in < 60s with average < 2ms query time
-- Stress-tested and horizontally scaled back-end microservice using Loader.io, k6, New Relic and Nginx with round robin selection to reach > 1000RPS using 3 AWS EC2 micro instances, a 900% increase in throughput
+- Stress-tested and horizontally scaled back-end microservice using Loader.io, k6, New Relic and NGINX with round robin selection to reach > 1000RPS using 3 AWS EC2 micro instances, a 900% increase in throughput
 - Architected caching layer with Redis to reduce sudden latency spikes at > 500RPS
